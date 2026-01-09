@@ -12,13 +12,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Security configuration for the application.
- * Configures authentication, authorization, and security filters.
+ * Configures JWT-based authentication, authorization, and security filters.
  */
 @Configuration
 @EnableWebSecurity
@@ -26,48 +28,70 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
+    // Public API endpoints (no authentication required)
+    private static final String[] PUBLIC_AUTH_ENDPOINTS = {
+            "/api/auth/**"
+    };
 
+    // Static resources and web pages
+    private static final String[] PUBLIC_WEB_ENDPOINTS = {
+            "/login",
+            "/register",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/error"
+    };
+
+    // Swagger/OpenAPI documentation endpoints
+    private static final String[] SWAGGER_ENDPOINTS = {
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml"
+    };
+
+    // Admin-only endpoints
+    private static final String[] ADMIN_ENDPOINTS = {
+            "/api/admin/**"
+    };
+
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    /**
+     * Configures the security filter chain with JWT authentication.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for API usage; enable for web forms
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        // Swagger/OpenAPI endpoints
-                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
-                        // Admin-only endpoints
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        // All other endpoints require authentication
+                        .requestMatchers(PUBLIC_AUTH_ENDPOINTS).permitAll()
+                        .requestMatchers(PUBLIC_WEB_ENDPOINTS).permitAll()
+                        .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+                        .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
-                )
-                .httpBasic(basic -> basic.realmName("Todo Summarized API")); // Enable HTTP Basic for API testing
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * BCrypt password encoder with default strength (10 rounds).
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * DAO authentication provider using custom user details service.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
@@ -75,9 +99,11 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Authentication manager for programmatic authentication.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
-

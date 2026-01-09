@@ -102,6 +102,12 @@ public class GlobalExceptionHandler {
         return buildWithRetryAfter(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request, ex.getRetryAfterSeconds());
     }
 
+    @ExceptionHandler(InvalidJwtTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJwtToken(InvalidJwtTokenException ex, HttpServletRequest request) {
+        log.warn("Invalid JWT token: {}", ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
         log.error("Unexpected error occurred", ex);

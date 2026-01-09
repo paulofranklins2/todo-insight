@@ -20,27 +20,25 @@ public class OpenAiProperties {
     /**
      * OpenAI model to use.
      */
-    private String model = "gpt-4.1-nano";
+    private String model;
 
     /**
      * Whether AI summary feature is enabled.
      */
-    private boolean enabled = true;
+    private boolean enabled;
 
     /**
      * Maximum tokens for AI response.
      */
-    private int maxTokens = 500;
+    private int maxTokens;
 
     /**
      * Temperature for AI response (0.0 - 2.0).
-     * Higher values make output more random.
      */
-    private double temperature = 0.7;
+    private double temperature;
 
     /**
      * Request timeout in seconds.
      */
-    private int timeoutSeconds = 30;
+    private int timeoutSeconds;
 }
-

@@ -5,6 +5,13 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+# JWT Configuration
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:900000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800000}
+  issuer: ${JWT_ISSUER:todo-summarized}
+
 # OpenAI Configuration
 openai:
   api-key: ${OPENAI_API_KEY}

@@ -1,6 +1,8 @@
 package org.duckdns.todosummarized.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,17 +22,19 @@ public class RateLimitProperties {
     /**
      * Rate limit configuration for the AI summary endpoint.
      */
-    private EndpointLimit aiSummary = new EndpointLimit(10, 60);
+    private EndpointLimit aiSummary = new EndpointLimit();
 
     /**
      * Rate limit configuration for the daily summary endpoint.
      */
-    private EndpointLimit dailySummary = new EndpointLimit(30, 60);
+    private EndpointLimit dailySummary = new EndpointLimit();
 
     /**
      * Configuration for a specific endpoint's rate limit.
      */
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class EndpointLimit {
         /**
          * Maximum number of requests allowed in the time window.
@@ -41,11 +45,5 @@ public class RateLimitProperties {
          * Time window in seconds.
          */
         private int windowSeconds;
-
-        public EndpointLimit(int maxRequests, int windowSeconds) {
-            this.maxRequests = maxRequests;
-            this.windowSeconds = windowSeconds;
-        }
     }
 }
-

@@ -58,7 +58,7 @@
 * [x] Spring Security configuration
 * [x] User registration and login endpoints
 * [x] User roles
-* [ ] JWT authentication
+* [x] JWT authentication
 * [ ] Tags / categories
 * [ ] Weekly summary endpoint
 * [ ] Cache daily summaries
