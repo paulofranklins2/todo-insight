@@ -1,4 +1,4 @@
-package org.duckdns.todosummarized.dto;
+package org.duckdns.todosummarized.repository;
 
 import org.duckdns.todosummarized.domains.enums.TaskPriority;
 import org.duckdns.todosummarized.domains.enums.TaskStatus;

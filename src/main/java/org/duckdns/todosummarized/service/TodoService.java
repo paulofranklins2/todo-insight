@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.duckdns.todosummarized.domains.entity.Todo;
 import org.duckdns.todosummarized.domains.enums.TaskStatus;
 import org.duckdns.todosummarized.dto.TodoMapper;
-import org.duckdns.todosummarized.dto.TodoQuery;
+import org.duckdns.todosummarized.repository.TodoQuery;
 import org.duckdns.todosummarized.dto.TodoRequestDTO;
 import org.duckdns.todosummarized.exception.TodoNotFoundException;
 import org.duckdns.todosummarized.repository.TodoRepository;

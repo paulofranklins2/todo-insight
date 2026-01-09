@@ -3,7 +3,7 @@ package org.duckdns.todosummarized.repository.spec;
 import jakarta.persistence.criteria.Predicate;
 import lombok.NoArgsConstructor;
 import org.duckdns.todosummarized.domains.entity.Todo;
-import org.duckdns.todosummarized.dto.TodoQuery;
+import org.duckdns.todosummarized.repository.TodoQuery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Clock;
