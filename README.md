@@ -15,6 +15,7 @@ AI-generated narrative.
 - **Bean Validation** (Jakarta Validation)
 - **Lombok** for boilerplate reduction
 - **JUnit 5 + Mockito** for testing
+- **Springdoc OpenAPI** for Swagger UI and API documentation
 
 ---
 
@@ -59,6 +60,15 @@ src/main/java/org/duckdns/todosummarized/
     └── TodoQuery.java
 ```
 
+---
+
+## API Documentation
+
+This project uses **Springdoc OpenAPI** for interactive API documentation.
+
+Once the application is running, access:
+- **Swagger UI**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **Swagger UI**: [https://todo-summarized.duckdns.org/swagger-ui.html](https://todo-summarized.duckdns.org/swagger-ui.html)
 ---
 
 ## TODO

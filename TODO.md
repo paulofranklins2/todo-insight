@@ -22,7 +22,7 @@
 * [x] Unit tests for SecurityConfig (8 tests, 80%+ coverage)
 * [x] Unit tests for TodoController (8 tests, 80%+ coverage)
 * [ ] Integration tests (Testcontainers + repository)
-* [ ] Swagger/OpenAPI documentation
+* [x] Swagger/OpenAPI documentation
 
 
 ## P1
