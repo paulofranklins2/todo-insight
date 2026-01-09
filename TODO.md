@@ -5,27 +5,29 @@
 * [x] Initialize Spring Boot project (Java 17, Maven)
 * [x] README setup steps (this file) kept accurate
 * [x] Create a TODO.md file
-* [ ] Add dependencies: Web, Validation, JPA, Flyway, Actuator, OpenAPI
+* [x] Add dependencies: Web, Validation, JPA, Thymeleaf, Security, PostgreSQL
 * [ ] Docker Compose for Postgres (db + volume)
-* [ ] Define Todo entity + enums (Status, Priority P0/P1/P2)
+* [x] Define Todo entity + enums (TaskStatus, TaskPriority)
 * [ ] Flyway migration: `todos` table with indexes (dueDate, status, priority)
-* [ ] CRUD endpoints for todos
-* [ ] Validation rules (title required, max lengths, valid priority)
+* [ ] CRUD endpoints for todos (REST Controller)
+* [x] Validation rules (title required, max lengths, valid priority)
 * [ ] Daily summary endpoint returning deterministic metrics
 * [ ] AI summary service adapter (feature-flagged, timeout, retries)
 * [ ] Fallback behavior (metrics-only summary if AI disabled/fails)
-* [ ] Basic error handling (global exception handler, clean error responses)
-* [ ] Unit tests for summary calculation logic
+* [x] Basic error handling (global exception handler, clean error responses)
+* [x] Unit tests for TodoMapper (17 tests, 100% coverage)
+* [x] Unit tests for GlobalExceptionHandler (13 tests, 80%+ coverage)
+* [x] Unit tests for TodoService (20 tests, 80%+ coverage)
 * [ ] Integration tests (Testcontainers + repository)
 * [ ] Swagger/OpenAPI documentation
 
 
 ## P1
 
-* [ ] Request/response DTOs (no entities exposed directly)
-* [ ] Pagination for `GET /todos`
-* [ ] Add filtering: status, priority
-* [ ] Add audit fields (createdAt/updatedAt) and automatic timestamps
+* [x] Request/response DTOs (TodoRequestDTO, TodoResponseDTO, TodoMapper)
+* [x] Pagination for `GET /todos` (via Spring Data Pageable)
+* [x] Add filtering: status, priority, dueDate range, overdue, upcoming (TodoQuery + TodoSpecs)
+* [x] Add audit fields (createdAt/updatedAt) and automatic timestamps (@PrePersist/@PreUpdate)
 * [ ] Add structured logging (request id / correlation id)
 * [ ] Actuator configuration (health/info/metrics)
 * [ ] GitHub Actions CI: build + test on PR

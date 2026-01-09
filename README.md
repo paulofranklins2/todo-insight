@@ -3,16 +3,49 @@
 A backend-first Todo app that keeps the scope small while still showing real engineering fundamentals. It stores daily todos, exposes a clean REST API, and generates an end-of-day summary using deterministic metrics plus an optional AI-generated narrative.
 
 ---
-# Features
 
-- Todo management
-- Create todos with title, optional description, due date, and priority
-- Update todo fields without full replacements (partial updates)
-- Mark todos as completed
-- List todos by date, status, and priority
-- Delete todos
+## Tech Stack
+
+- **Java 17** with **Spring Boot 4.0**
+- **Spring Data JPA** with PostgreSQL
+- **Spring Security** (configured for future auth)
+- **Thymeleaf** (for future frontend)
+- **Bean Validation** (Jakarta Validation)
+- **Lombok** for boilerplate reduction
+- **JUnit 5 + Mockito** for testing
+
 ---
 
-# TODO
+## Project Structure
 
-- You should be able to track development process in at [TODO.md](TODO.md)
+```
+src/main/java/org/duckdns/todosummarized/
+├── config/              # Configuration classes (TimeConfig)
+├── controller/          # REST controllers (TODO)
+├── domains/
+│   ├── entity/          # JPA entities (Todo, User)
+│   └── enums/           # TaskStatus, TaskPriority
+├── dto/                 # Data Transfer Objects
+│   ├── TodoMapper.java      # Entity <-> DTO mapping
+│   ├── TodoRequestDTO.java  # Input validation
+│   └── TodoResponseDTO.java # API response
+├── exception/           # Global exception handling
+│   ├── GlobalExceptionHandler.java
+│   ├── ErrorResponse.java
+│   ├── TodoNotFoundException.java
+│   ├── InvalidTodoException.java
+│   └── DuplicateTodoException.java
+├── repository/          # Data access layer
+│   ├── TodoRepository.java
+│   ├── TodoQuery.java       # Search criteria record
+│   └── spec/
+│       └── TodoSpecs.java   # JPA Specifications for filtering
+└── service/
+    └── TodoService.java     # Business logic
+```
+
+---
+
+## TODO
+
+Track development progress in [TODO.md](TODO.md)
