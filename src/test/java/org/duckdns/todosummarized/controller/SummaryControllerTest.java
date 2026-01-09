@@ -2,10 +2,15 @@ package org.duckdns.todosummarized.controller;
 
 import org.duckdns.todosummarized.domains.entity.User;
 import org.duckdns.todosummarized.domains.enums.Role;
+import org.duckdns.todosummarized.domains.enums.SummaryType;
+import org.duckdns.todosummarized.dto.AiSummaryDTO;
 import org.duckdns.todosummarized.dto.DailySummaryDTO;
+import org.duckdns.todosummarized.dto.SummaryTypeDTO;
+import org.duckdns.todosummarized.service.AiSummaryService;
 import org.duckdns.todosummarized.service.SummaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +32,9 @@ class SummaryControllerTest {
 
     @Mock
     private SummaryService summaryService;
+
+    @Mock
+    private AiSummaryService aiSummaryService;
 
     @InjectMocks
     private SummaryController summaryController;
@@ -123,6 +132,118 @@ class SummaryControllerTest {
 
         verify(summaryService, times(1)).getDailySummary(user);
         verifyNoMoreInteractions(summaryService);
+    }
+
+    @Nested
+    @DisplayName("getAiSummary")
+    class GetAiSummaryTests {
+
+        @Test
+        @DisplayName("returns 200 with AI-generated summary")
+        void getAiSummary_returnsOkWithAiSummary() {
+            DailySummaryDTO metrics = createSampleMetrics();
+            AiSummaryDTO aiSummary = AiSummaryDTO.aiGenerated(
+                    LocalDate.of(2026, 1, 9),
+                    SummaryType.DEVELOPER,
+                    "AI generated summary",
+                    "gpt-4o-mini",
+                    metrics
+            );
+
+            when(aiSummaryService.getAiSummary(user, SummaryType.DEVELOPER)).thenReturn(aiSummary);
+
+            ResponseEntity<AiSummaryDTO> response = summaryController.getAiSummary(user, SummaryType.DEVELOPER);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertTrue(response.getBody().aiGenerated());
+            assertEquals("AI generated summary", response.getBody().summary());
+        }
+
+        @Test
+        @DisplayName("returns 200 with fallback when AI disabled")
+        void getAiSummary_returnsFallbackWhenDisabled() {
+            DailySummaryDTO metrics = createSampleMetrics();
+            AiSummaryDTO fallback = AiSummaryDTO.fallback(
+                    LocalDate.of(2026, 1, 9),
+                    SummaryType.EXECUTIVE,
+                    "AI summary feature is disabled",
+                    metrics
+            );
+
+            when(aiSummaryService.getAiSummary(user, SummaryType.EXECUTIVE)).thenReturn(fallback);
+
+            ResponseEntity<AiSummaryDTO> response = summaryController.getAiSummary(user, SummaryType.EXECUTIVE);
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertFalse(response.getBody().aiGenerated());
+            assertEquals("AI summary feature is disabled", response.getBody().fallbackReason());
+        }
+    }
+
+    @Nested
+    @DisplayName("getSummaryTypes")
+    class GetSummaryTypesTests {
+
+        @Test
+        @DisplayName("returns 200 with all summary types")
+        void getSummaryTypes_returnsAllTypes() {
+            List<SummaryTypeDTO> types = List.of(
+                    SummaryTypeDTO.from(SummaryType.DEVELOPER),
+                    SummaryTypeDTO.from(SummaryType.EXECUTIVE)
+            );
+
+            when(aiSummaryService.getAvailableSummaryTypes()).thenReturn(types);
+
+            ResponseEntity<List<SummaryTypeDTO>> response = summaryController.getSummaryTypes();
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(2, response.getBody().size());
+        }
+    }
+
+    @Nested
+    @DisplayName("getAiStatus")
+    class GetAiStatusTests {
+
+        @Test
+        @DisplayName("returns 200 with available true when AI is enabled")
+        void getAiStatus_returnsAvailableTrue() {
+            when(aiSummaryService.isAiAvailable()).thenReturn(true);
+
+            ResponseEntity<Map<String, Boolean>> response = summaryController.getAiStatus();
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody().get("available"));
+        }
+
+        @Test
+        @DisplayName("returns 200 with available false when AI is disabled")
+        void getAiStatus_returnsAvailableFalse() {
+            when(aiSummaryService.isAiAvailable()).thenReturn(false);
+
+            ResponseEntity<Map<String, Boolean>> response = summaryController.getAiStatus();
+
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertFalse(response.getBody().get("available"));
+        }
+    }
+
+    private DailySummaryDTO createSampleMetrics() {
+        return DailySummaryDTO.builder()
+                .date(LocalDate.of(2026, 1, 9))
+                .totalTodos(25)
+                .completedCount(10)
+                .inProgressCount(8)
+                .notStartedCount(5)
+                .cancelledCount(2)
+                .overdueCount(3)
+                .dueTodayCount(4)
+                .upcomingCount(6)
+                .completionRate(43.48)
+                .byPriority(Map.of("LOW", 5L, "MEDIUM", 10L, "HIGH", 8L, "CRITICAL", 2L))
+                .byStatus(Map.of("COMPLETED", 10L, "IN_PROGRESS", 8L, "NOT_STARTED", 5L, "CANCELLED", 2L))
+                .build();
     }
 }
 

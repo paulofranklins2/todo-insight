@@ -1,0 +1,218 @@
+package org.duckdns.todosummarized.service;
+
+import org.duckdns.todosummarized.domains.entity.User;
+import org.duckdns.todosummarized.domains.enums.Role;
+import org.duckdns.todosummarized.domains.enums.SummaryType;
+import org.duckdns.todosummarized.dto.AiSummaryDTO;
+import org.duckdns.todosummarized.dto.DailySummaryDTO;
+import org.duckdns.todosummarized.dto.SummaryTypeDTO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class AiSummaryServiceTest {
+
+    @Mock
+    private SummaryService summaryService;
+
+    @Mock
+    private AiSummaryAdapter aiAdapter;
+
+    @Mock
+    private Clock clock;
+
+    @InjectMocks
+    private AiSummaryService aiSummaryService;
+
+    private User user;
+    private DailySummaryDTO sampleMetrics;
+
+    private static final LocalDate FIXED_DATE = LocalDate.of(2026, 1, 9);
+    private static final ZoneId ZONE_ID = ZoneId.systemDefault();
+
+    @BeforeEach
+    void setUp() {
+        Instant fixedInstant = FIXED_DATE.atStartOfDay(ZONE_ID).toInstant();
+        lenient().when(clock.instant()).thenReturn(fixedInstant);
+        lenient().when(clock.getZone()).thenReturn(ZONE_ID);
+
+        user = User.builder()
+                .id(UUID.randomUUID())
+                .email("test@example.com")
+                .password("password")
+                .role(Role.ROLE_USER)
+                .build();
+
+        sampleMetrics = DailySummaryDTO.builder()
+                .date(FIXED_DATE)
+                .totalTodos(25)
+                .completedCount(10)
+                .inProgressCount(8)
+                .notStartedCount(5)
+                .cancelledCount(2)
+                .overdueCount(3)
+                .dueTodayCount(4)
+                .upcomingCount(6)
+                .completionRate(43.48)
+                .byPriority(Map.of("HIGH", 5L, "MEDIUM", 12L, "LOW", 6L, "NONE", 2L))
+                .byStatus(Map.of("COMPLETED", 10L, "IN_PROGRESS", 8L, "NOT_STARTED", 5L, "CANCELLED", 2L))
+                .build();
+    }
+
+    @Nested
+    @DisplayName("getAiSummary")
+    class GetAiSummaryTests {
+
+        @Test
+        @DisplayName("should return AI-generated summary when AI is enabled and succeeds")
+        void shouldReturnAiGeneratedSummary() {
+            when(summaryService.getDailySummary(user)).thenReturn(sampleMetrics);
+            when(aiAdapter.isEnabled()).thenReturn(true);
+            when(aiAdapter.generateSummary(sampleMetrics, SummaryType.DEVELOPER))
+                    .thenReturn(Optional.of("AI generated summary text"));
+            when(aiAdapter.getModel()).thenReturn("gpt-4o-mini");
+
+            AiSummaryDTO result = aiSummaryService.getAiSummary(user, SummaryType.DEVELOPER);
+
+            assertTrue(result.aiGenerated());
+            assertEquals("AI generated summary text", result.summary());
+            assertEquals(SummaryType.DEVELOPER, result.summaryType());
+            assertEquals("Software Engineer / Developer", result.summaryTypeName());
+            assertEquals("gpt-4o-mini", result.model());
+            assertNull(result.fallbackReason());
+            assertNotNull(result.metrics());
+        }
+
+        @Test
+        @DisplayName("should return fallback when AI is disabled")
+        void shouldReturnFallbackWhenDisabled() {
+            when(summaryService.getDailySummary(user)).thenReturn(sampleMetrics);
+            when(aiAdapter.isEnabled()).thenReturn(false);
+            when(aiAdapter.getUnavailableReason()).thenReturn("AI summary feature is disabled");
+
+            AiSummaryDTO result = aiSummaryService.getAiSummary(user, SummaryType.EXECUTIVE);
+
+            assertFalse(result.aiGenerated());
+            assertNull(result.summary());
+            assertNull(result.model());
+            assertEquals("AI summary feature is disabled", result.fallbackReason());
+            assertEquals(SummaryType.EXECUTIVE, result.summaryType());
+            assertNotNull(result.metrics());
+        }
+
+        @Test
+        @DisplayName("should return fallback when AI generation fails")
+        void shouldReturnFallbackWhenGenerationFails() {
+            when(summaryService.getDailySummary(user)).thenReturn(sampleMetrics);
+            when(aiAdapter.isEnabled()).thenReturn(true);
+            when(aiAdapter.generateSummary(sampleMetrics, SummaryType.STUDENT))
+                    .thenReturn(Optional.empty());
+            when(aiAdapter.getUnavailableReason()).thenReturn("AI service encountered an error");
+
+            AiSummaryDTO result = aiSummaryService.getAiSummary(user, SummaryType.STUDENT);
+
+            assertFalse(result.aiGenerated());
+            assertNull(result.summary());
+            assertEquals("AI service encountered an error", result.fallbackReason());
+        }
+
+        @Test
+        @DisplayName("should include date in response")
+        void shouldIncludeDateInResponse() {
+            when(summaryService.getDailySummary(user)).thenReturn(sampleMetrics);
+            when(aiAdapter.isEnabled()).thenReturn(true);
+            when(aiAdapter.generateSummary(any(), any())).thenReturn(Optional.of("Summary"));
+            when(aiAdapter.getModel()).thenReturn("gpt-4o-mini");
+
+            AiSummaryDTO result = aiSummaryService.getAiSummary(user, SummaryType.DEVELOPER);
+
+            assertEquals(FIXED_DATE, result.date());
+        }
+    }
+
+    @Nested
+    @DisplayName("getAvailableSummaryTypes")
+    class GetAvailableSummaryTypesTests {
+
+        @Test
+        @DisplayName("should return all summary types")
+        void shouldReturnAllSummaryTypes() {
+            List<SummaryTypeDTO> result = aiSummaryService.getAvailableSummaryTypes();
+
+            assertEquals(SummaryType.values().length, result.size());
+        }
+
+        @Test
+        @DisplayName("should include all expected summary types")
+        void shouldIncludeAllExpectedTypes() {
+            List<SummaryTypeDTO> result = aiSummaryService.getAvailableSummaryTypes();
+
+            List<String> values = result.stream().map(SummaryTypeDTO::value).toList();
+
+            assertTrue(values.contains("EXECUTIVE"));
+            assertTrue(values.contains("DEVELOPER"));
+            assertTrue(values.contains("STUDENT"));
+            assertTrue(values.contains("FOCUS_SUPPORT"));
+            assertTrue(values.contains("CREATIVE"));
+            assertTrue(values.contains("OPERATIONS"));
+            assertTrue(values.contains("PERSONAL"));
+            assertTrue(values.contains("STANDUP"));
+            assertTrue(values.contains("WEEKLY_REVIEW"));
+            assertTrue(values.contains("MINIMAL"));
+        }
+
+        @Test
+        @DisplayName("should include display names and descriptions")
+        void shouldIncludeDisplayNamesAndDescriptions() {
+            List<SummaryTypeDTO> result = aiSummaryService.getAvailableSummaryTypes();
+
+            SummaryTypeDTO developer = result.stream()
+                    .filter(t -> t.value().equals("DEVELOPER"))
+                    .findFirst()
+                    .orElseThrow();
+
+            assertEquals("Software Engineer / Developer", developer.displayName());
+            assertEquals("Structured, technical, standup-ready.", developer.description());
+        }
+    }
+
+    @Nested
+    @DisplayName("isAiAvailable")
+    class IsAiAvailableTests {
+
+        @Test
+        @DisplayName("should return true when AI is enabled")
+        void shouldReturnTrueWhenEnabled() {
+            when(aiAdapter.isEnabled()).thenReturn(true);
+
+            assertTrue(aiSummaryService.isAiAvailable());
+        }
+
+        @Test
+        @DisplayName("should return false when AI is disabled")
+        void shouldReturnFalseWhenDisabled() {
+            when(aiAdapter.isEnabled()).thenReturn(false);
+
+            assertFalse(aiSummaryService.isAiAvailable());
+        }
+    }
+}
+

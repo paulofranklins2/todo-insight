@@ -9,3 +9,6 @@ openai:
   api-key: your-openai-api-key-here
   model: gpt-4o-mini
   enabled: true
+  max-tokens: 500
+  temperature: 0.7
+  timeout-seconds: 30

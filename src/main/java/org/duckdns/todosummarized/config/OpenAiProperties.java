@@ -26,5 +26,21 @@ public class OpenAiProperties {
      * Whether AI summary feature is enabled.
      */
     private boolean enabled = true;
+
+    /**
+     * Maximum tokens for AI response.
+     */
+    private int maxTokens = 500;
+
+    /**
+     * Temperature for AI response (0.0 - 2.0).
+     * Higher values make output more random.
+     */
+    private double temperature = 0.7;
+
+    /**
+     * Request timeout in seconds.
+     */
+    private int timeoutSeconds = 30;
 }
 

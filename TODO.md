@@ -25,8 +25,8 @@
 * [x] Swagger/OpenAPI documentation for all endpoints
 * [x] Validation rules (title required, max lengths, valid enums)
 * [x] Daily summary endpoint (metrics only)
-* [ ] AI summary adapter (config + feature flag)
-* [ ] Metrics-only fallback if AI fails or is disabled
+* [x] AI summary adapter (config + feature flag)
+* [x] Metrics-only fallback if AI fails or is disabled
 * [x] Global exception handling with structured error responses
 * [ ] Integration tests (Testcontainers + repositories)
 * [x] Swagger security schemes configured
