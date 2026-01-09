@@ -1,0 +1,185 @@
+package org.duckdns.todosummarized.controller;
+
+import org.duckdns.todosummarized.domains.entity.Todo;
+import org.duckdns.todosummarized.domains.enums.TaskPriority;
+import org.duckdns.todosummarized.domains.enums.TaskStatus;
+import org.duckdns.todosummarized.dto.TodoRequestDTO;
+import org.duckdns.todosummarized.dto.TodoResponseDTO;
+import org.duckdns.todosummarized.exception.TodoNotFoundException;
+import org.duckdns.todosummarized.repository.TodoQuery;
+import org.duckdns.todosummarized.service.TodoService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
+class TodoControllerTest {
+
+    @Mock
+    private TodoService todoService;
+
+    @InjectMocks
+    private TodoController todoController;
+
+    private UUID id;
+    private Todo todo;
+    private TodoRequestDTO request;
+
+    @BeforeEach
+    void setUp() {
+        id = UUID.randomUUID();
+
+        todo = new Todo();
+        todo.setId(id);
+        todo.setTitle("Test Todo");
+        todo.setDescription("Test Description");
+        todo.setPriority(TaskPriority.MEDIUM);
+        todo.setStatus(TaskStatus.NOT_STARTED);
+
+        request = TodoRequestDTO.builder()
+                .title("Test Todo")
+                .description("Test Description")
+                .priority(TaskPriority.MEDIUM)
+                .status(TaskStatus.NOT_STARTED)
+                .build();
+    }
+
+    /**
+     * createTodo returns 201 and mapped response
+     */
+    @Test
+    void createTodo_returnsCreated() {
+        when(todoService.createTodo(any())).thenReturn(todo);
+
+        ResponseEntity<TodoResponseDTO> response =
+                todoController.createTodo(request);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(id, response.getBody().id());
+
+        verify(todoService).createTodo(request);
+    }
+
+    /**
+     * getTodoById returns todo when found
+     */
+    @Test
+    void getTodoById_returnsTodo() {
+        when(todoService.getTodoById(id)).thenReturn(todo);
+
+        ResponseEntity<TodoResponseDTO> response =
+                todoController.getTodoById(id);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(id, response.getBody().id());
+    }
+
+    /**
+     * getTodoById throws when todo does not exist
+     */
+    @Test
+    void getTodoById_throwsWhenNotFound() {
+        when(todoService.getTodoById(id))
+                .thenThrow(new TodoNotFoundException(id));
+
+        assertThrows(
+                TodoNotFoundException.class,
+                () -> todoController.getTodoById(id)
+        );
+    }
+
+    /**
+     * updateTodo returns updated todo
+     */
+    @Test
+    void updateTodo_returnsUpdatedTodo() {
+        when(todoService.updateTodo(eq(id), any()))
+                .thenReturn(todo);
+
+        ResponseEntity<TodoResponseDTO> response =
+                todoController.updateTodo(id, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(id, response.getBody().id());
+    }
+
+    /**
+     * deleteTodo returns 204
+     */
+    @Test
+    void deleteTodo_returnsNoContent() {
+        doNothing().when(todoService).deleteTodo(id);
+
+        ResponseEntity<Void> response =
+                todoController.deleteTodo(id);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    /**
+     * updateStatus updates todo status
+     */
+    @Test
+    void updateStatus_updatesStatus() {
+        todo.setStatus(TaskStatus.COMPLETED);
+        when(todoService.updateStatus(id, TaskStatus.COMPLETED))
+                .thenReturn(todo);
+
+        ResponseEntity<TodoResponseDTO> response =
+                todoController.updateStatus(id, TaskStatus.COMPLETED);
+
+        assertEquals(TaskStatus.COMPLETED, response.getBody().status());
+    }
+
+    /**
+     * searchTodos passes filters to service
+     */
+    @Test
+    void searchTodos_passesFilters() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(todoService.search(any(TodoQuery.class), eq(pageable)))
+                .thenReturn(Page.empty(pageable));
+
+        todoController.searchTodos(
+                TaskStatus.IN_PROGRESS,
+                TaskPriority.HIGH,
+                null,
+                null,
+                true,
+                false,
+                pageable
+        );
+
+        ArgumentCaptor<TodoQuery> captor =
+                ArgumentCaptor.forClass(TodoQuery.class);
+
+        verify(todoService).search(captor.capture(), eq(pageable));
+
+        TodoQuery query = captor.getValue();
+        assertEquals(TaskStatus.IN_PROGRESS, query.status());
+        assertEquals(TaskPriority.HIGH, query.priority());
+        assertTrue(query.overdue());
+        assertFalse(query.upcoming());
+    }
+}
+
+

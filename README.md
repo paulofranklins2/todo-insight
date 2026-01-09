@@ -1,6 +1,8 @@
 # AI Daily Summary Todo API
 
-A backend-first Todo app that keeps the scope small while still showing real engineering fundamentals. It stores daily todos, exposes a clean REST API, and generates an end-of-day summary using deterministic metrics plus an optional AI-generated narrative.
+A backend-first Todo app that keeps the scope small while still showing real engineering fundamentals. It stores daily
+todos, exposes a clean REST API, and generates an end-of-day summary using deterministic metrics plus an optional
+AI-generated narrative.
 
 ---
 
@@ -20,33 +22,41 @@ A backend-first Todo app that keeps the scope small while still showing real eng
 
 ```
 src/main/java/org/duckdns/todosummarized/
-├── config/              # Configuration classes (SecurityConfig, TimeConfig)
-├── controller/          # REST controllers (TODO)
-├── domains/
-│   ├── entity/          # JPA entities (Todo, User)
-│   └── enums/           # TaskStatus, TaskPriority
-├── dto/                 # Data Transfer Objects
-│   ├── TodoMapper.java          # Entity <-> DTO mapping
-│   ├── TodoRequestDTO.java      # Todo input validation
-│   ├── TodoResponseDTO.java     # Todo API response
-│   ├── UserRegistrationDTO.java # User registration input
-│   └── UserResponseDTO.java     # User API response
-├── exception/           # Global exception handling
+├── config/                 # Security, time, app config
+├── controller/             # REST controllers
+│   └── TodoController.java
+├── domain/
+│   ├── entity/             # JPA entities
+│   │   ├── Todo.java
+│   │   └── User.java
+│   └── enums/              # Domain enums
+│       ├── TaskStatus.java
+│       └── TaskPriority.java
+├── dto/
+│   ├── todo/
+│   │   ├── TodoRequestDTO.java
+│   │   ├── TodoResponseDTO.java
+│   │   └── TodoMapper.java
+│   └── user/
+│       ├── UserRegistrationDTO.java
+│       └── UserResponseDTO.java
+├── exception/
 │   ├── GlobalExceptionHandler.java
 │   ├── ErrorResponse.java
 │   ├── TodoNotFoundException.java
 │   ├── InvalidTodoException.java
 │   ├── DuplicateTodoException.java
 │   └── UserAlreadyExistsException.java
-├── repository/          # Data access layer
+├── repository/
 │   ├── TodoRepository.java
 │   ├── UserRepository.java
-│   ├── TodoQuery.java       # Search criteria record
 │   └── spec/
-│       └── TodoSpecs.java   # JPA Specifications for filtering
-└── service/
-    ├── TodoService.java     # Todo business logic
-    └── UserService.java     # User registration & profile
+│       └── TodoSpecs.java
+├── service/
+│   ├── TodoService.java
+│   └── UserService.java
+└── search/
+    └── TodoQuery.java
 ```
 
 ---

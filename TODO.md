@@ -9,7 +9,7 @@
 * [ ] Docker Compose for Postgres (db + volume)
 * [x] Define Todo entity + enums (TaskStatus, TaskPriority)
 * [ ] Flyway migration: `todos` table with indexes (dueDate, status, priority)
-* [ ] CRUD endpoints for todos (REST Controller)
+* [x] CRUD endpoints for todos (REST Controller)
 * [x] Validation rules (title required, max lengths, valid priority)
 * [ ] Daily summary endpoint returning deterministic metrics
 * [ ] AI summary service adapter (feature-flagged, timeout, retries)
@@ -20,6 +20,7 @@
 * [x] Unit tests for TodoService (20 tests, 80%+ coverage)
 * [x] Unit tests for UserService (24 tests, 80%+ coverage)
 * [x] Unit tests for SecurityConfig (8 tests, 80%+ coverage)
+* [x] Unit tests for TodoController (8 tests, 80%+ coverage)
 * [ ] Integration tests (Testcontainers + repository)
 * [ ] Swagger/OpenAPI documentation
 
