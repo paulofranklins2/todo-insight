@@ -4,3 +4,8 @@ spring:
     username: username
     password: password
     url: jdbc:postgresql://localhost:5432/todo_db
+
+openai:
+  api-key: your-openai-api-key-here
+  model: gpt-4o-mini
+  enabled: true
