@@ -1,51 +1,113 @@
 # Scaffolding TODO list
 
-## P0
+---
 
-* [x] Initialize Spring Boot project (Java 17, Maven)
-* [x] README setup steps (this file) kept accurate
-* [x] Create a TODO.md file
-* [x] Add dependencies: Web, Validation, JPA, Thymeleaf, Security, PostgreSQL
+# Todo Summarized – TODO
+
+**Last updated:** 2026-01-09
+
+---
+
+## P0 – Core (Critical)
+
+* [x] Initialize Spring Boot project (Java 17, Spring Boot 4.0.1)
+* [x] Keep README setup instructions accurate
+* [x] Create TODO.md
+* [x] Add dependencies (Web, Validation, JPA, Security, PostgreSQL, Thymeleaf)
 * [ ] Docker Compose for Postgres (db + volume)
-* [x] Define Todo entity + enums (TaskStatus, TaskPriority)
-* [ ] Flyway migration: `todos` table with indexes (dueDate, status, priority)
-* [x] CRUD endpoints for todos (REST Controller)
-* [x] Validation rules (title required, max lengths, valid priority)
-* [x] Daily summary endpoint returning deterministic metrics
-* [ ] AI summary service adapter (feature-flagged, timeout, retries)
-* [ ] Fallback behavior (metrics-only summary if AI disabled/fails)
-* [x] Basic error handling (global exception handler, clean error responses)
-* [x] Unit tests for TodoMapper (17 tests, 100% coverage)
-* [x] Unit tests for GlobalExceptionHandler (13 tests, 80%+ coverage)
-* [x] Unit tests for TodoService (20 tests, 80%+ coverage)
-* [x] Unit tests for UserService (24 tests, 80%+ coverage)
-* [x] Unit tests for SecurityConfig (8 tests, 80%+ coverage)
-* [x] Unit tests for TodoController (8 tests, 80%+ coverage)
-* [x] Unit tests for SummaryService (10 tests, 80%+ coverage)
-* [x] Unit tests for SummaryController (3 tests, 80%+ coverage)
-* [ ] Integration tests (Testcontainers + repository)
-* [x] Swagger/OpenAPI documentation
+* [x] Define Todo entity
+* [x] Define enums (TaskStatus, TaskPriority)
+* [ ] Flyway migration for `todos` table
+    * [ ] Index: due_date
+    * [ ] Index: status
+    * [ ] Index: priority
+* [x] CRUD REST endpoints for todos
+* [x] Swagger/OpenAPI documentation for all endpoints
+* [x] Validation rules (title required, max lengths, valid enums)
+* [x] Daily summary endpoint (metrics only)
+* [ ] AI summary adapter (config + feature flag)
+* [ ] Metrics-only fallback if AI fails or is disabled
+* [x] Global exception handling with structured error responses
+* [ ] Integration tests (Testcontainers + repositories)
+* [x] Swagger security schemes configured
 
+---
 
-## P1
+## P1 – Enhancements
 
-* [x] Request/response DTOs (TodoRequestDTO, TodoResponseDTO, TodoMapper)
-* [x] Pagination for `GET /todos` (via Spring Data Pageable)
-* [x] Add filtering: status, priority, dueDate range, overdue, upcoming (TodoQuery + TodoSpecs)
-* [x] Add audit fields (createdAt/updatedAt) and automatic timestamps (@PrePersist/@PreUpdate)
-* [ ] Add structured logging (request id / correlation id)
-* [ ] Actuator configuration (health/info/metrics)
-* [ ] GitHub Actions CI: build + test on PR
-* [ ] Add AI prompt versioning (`promptVersion` field in response)
-* [ ] Add rate limiting or simple abuse protection for summary endpoint
+* [x] Request/response DTOs
+* [x] TodoMapper
+* [x] Pagination for `GET /todos` (max 20 per page)
+* [x] Filtering
 
-## P2
+    * [x] Status
+    * [x] Priority
+    * [x] Due date range
+    * [x] Overdue
+    * [x] Upcoming
+* [x] Audit fields (createdAt, updatedAt)
+* [ ] Structured logging (request id / correlation id)
+* [ ] Actuator (health, info, metrics)
+* [ ] GitHub Actions CI (build + test)
+* [ ] AI prompt versioning in response
+* [ ] Rate limiting for summary endpoint
 
-* [ ] Add simple Thymeleaf frontend for user experience
-* [x] Add Spring Security for user login/logout and account management
-* [ ] Add user accounts + JWT auth
-* [ ] Add tags/categories
+---
+
+## P2 – Future
+
+* [ ] Simple Thymeleaf UI
+* [x] Spring Security configuration
+* [x] User registration and login endpoints
+* [x] User roles (ROLE_USER, ROLE_ADMIN)
+* [ ] JWT authentication
+* [ ] Tags / categories
 * [ ] Weekly summary endpoint
-* [ ] Cache daily summaries for a short TTL
-* [ ] Add a minimal frontend (optional) or CLI client
-* [ ] Deploy to a free host (Render/Fly.io) with env-based config
+* [ ] Cache daily summaries (short TTL)
+* [ ] CLI client or minimal frontend
+* [ ] Deploy to free hosting (Render or Fly.io)
+
+---
+
+## Testing
+
+* [x] TodoMapper unit tests
+* [x] GlobalExceptionHandler tests
+* [x] TodoService tests
+* [x] UserService tests
+* [x] SecurityConfig tests
+* [x] TodoController tests
+* [x] SummaryService tests
+* [x] SummaryController tests
+* [x] AuthController tests
+* [x] CustomUserDetailsService tests
+* [ ] Integration tests
+
+---
+
+## Implemented (Quick Reference)
+
+### Authentication
+
+* [x] User signup and signin
+* [x] BCrypt password encoding
+* [x] Form login
+* [x] HTTP Basic (API testing)
+* [x] Role-based authorization
+* [x] CSRF disabled for API
+
+### Todos
+
+* [x] User-scoped CRUD
+* [x] Status update (PATCH)
+* [x] Search and filtering
+* [x] Pagination
+
+### Daily Summary
+
+* [x] Status counts
+* [x] Priority counts
+* [x] Overdue count
+* [x] Upcoming count
+* [x] Due today count
+* [x] Completion rate
