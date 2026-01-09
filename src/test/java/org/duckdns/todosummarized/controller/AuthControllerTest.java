@@ -1,9 +1,12 @@
 package org.duckdns.todosummarized.controller;
 
+import org.duckdns.todosummarized.config.JwtProperties;
+import org.duckdns.todosummarized.dto.AuthTokenResponseDTO;
 import org.duckdns.todosummarized.dto.UserLoginDTO;
 import org.duckdns.todosummarized.dto.UserRegistrationDTO;
 import org.duckdns.todosummarized.dto.UserResponseDTO;
 import org.duckdns.todosummarized.exception.UserAlreadyExistsException;
+import org.duckdns.todosummarized.service.JwtService;
 import org.duckdns.todosummarized.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,12 +20,17 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +40,16 @@ class AuthControllerTest {
     private UserService userService;
 
     @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private JwtProperties jwtProperties;
+
+    @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @InjectMocks
     private AuthController authController;
@@ -40,6 +57,7 @@ class AuthControllerTest {
     private UserRegistrationDTO registrationDTO;
     private UserLoginDTO loginDTO;
     private UserResponseDTO userResponseDTO;
+    private UserDetails userDetails;
 
     @BeforeEach
     void setUp() {
@@ -61,23 +79,31 @@ class AuthControllerTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        userDetails = new User("test@example.com", "password123", Collections.emptyList());
     }
 
     /**
-     * signUp returns 201 and user response when registration is successful
+     * signUp returns 201 and auth token response when registration is successful
      */
     @Test
     void signUp_returnsCreated() {
         when(userService.registerUser(any())).thenReturn(userResponseDTO);
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
+        when(jwtService.generateAccessToken(any(UserDetails.class))).thenReturn("access-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh-token");
+        when(jwtProperties.getAccessTokenExpiration()).thenReturn(900000L);
 
-        ResponseEntity<UserResponseDTO> response = authController.signUp(registrationDTO);
+        ResponseEntity<AuthTokenResponseDTO> response = authController.signUp(registrationDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("test@example.com", response.getBody().getEmail());
-        assertEquals("ROLE_USER", response.getBody().getRole());
+        assertEquals("access-token", response.getBody().getAccessToken());
+        assertEquals("refresh-token", response.getBody().getRefreshToken());
+        assertEquals("Bearer", response.getBody().getTokenType());
 
         verify(userService).registerUser(registrationDTO);
+        verify(userDetailsService).loadUserByUsername("test@example.com");
     }
 
     /**
@@ -95,22 +121,27 @@ class AuthControllerTest {
     }
 
     /**
-     * signIn returns 200 and user response when authentication is successful
+     * signIn returns 200 and auth token response when authentication is successful
      */
     @Test
     void signIn_returnsOk() {
         Authentication mockAuth = mock(Authentication.class);
         when(authenticationManager.authenticate(any())).thenReturn(mockAuth);
-        when(userService.getUserProfile(any())).thenReturn(userResponseDTO);
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
+        when(jwtService.generateAccessToken(any(UserDetails.class))).thenReturn("access-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refresh-token");
+        when(jwtProperties.getAccessTokenExpiration()).thenReturn(900000L);
 
-        ResponseEntity<UserResponseDTO> response = authController.signIn(loginDTO);
+        ResponseEntity<AuthTokenResponseDTO> response = authController.signIn(loginDTO);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("test@example.com", response.getBody().getEmail());
+        assertEquals("access-token", response.getBody().getAccessToken());
+        assertEquals("refresh-token", response.getBody().getRefreshToken());
+        assertEquals("Bearer", response.getBody().getTokenType());
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userService).getUserProfile("test@example.com");
+        verify(userDetailsService).loadUserByUsername("test@example.com");
     }
 
     /**
@@ -125,7 +156,7 @@ class AuthControllerTest {
                 () -> authController.signIn(loginDTO));
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userService, never()).getUserProfile(any());
+        verify(userDetailsService, never()).loadUserByUsername(any());
     }
 }
 

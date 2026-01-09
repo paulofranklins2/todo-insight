@@ -22,11 +22,14 @@ class SecurityConfigTest {
     @Mock
     private CustomUserDetailsService userDetailsService;
 
+    @Mock
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
     private SecurityConfig securityConfig;
 
     @BeforeEach
     void setUp() {
-        securityConfig = new SecurityConfig(userDetailsService);
+        securityConfig = new SecurityConfig(userDetailsService, jwtAuthenticationFilter);
     }
 
     @Nested
