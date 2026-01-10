@@ -14,9 +14,6 @@ public class CacheKeyBuilder {
 
     /**
      * Builds a cache key for a user's AI insight.
-     *
-     * @param user the user
-     * @return the cache key
      */
     public String forAiInsight(User user) {
         return AI_INSIGHT_PREFIX + user.getId().toString();

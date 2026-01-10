@@ -55,10 +55,6 @@ public abstract class BaseAiSummaryAdapter {
     /**
      * Generates an AI summary for the given metrics using the specified summary type.
      * Returns empty Optional if AI is disabled or an error occurs.
-     *
-     * @param metrics     the daily summary metrics to summarize
-     * @param summaryType the type of summary to generate
-     * @return Optional containing the generated summary, or empty if unavailable
      */
     public Optional<String> generateSummary(DailySummaryDTO metrics, SummaryType summaryType) {
         if (!isEnabled()) {
@@ -83,8 +79,6 @@ public abstract class BaseAiSummaryAdapter {
 
     /**
      * Returns the reason why this AI provider is unavailable.
-     *
-     * @return description of why AI cannot be used
      */
     public String getUnavailableReason() {
         if (!isEnabled()) {
@@ -98,8 +92,6 @@ public abstract class BaseAiSummaryAdapter {
 
     /**
      * Checks if the API key is properly configured.
-     *
-     * @return true if API key is present and not blank
      */
     protected boolean isApiKeyConfigured() {
         String apiKey = getApiKey();
@@ -135,11 +127,6 @@ public abstract class BaseAiSummaryAdapter {
 
     /**
      * Calls the AI provider's API with the given prompts.
-     *
-     * @param systemPrompt the system prompt for context
-     * @param userMessage  the user message with metrics
-     * @return the AI-generated response content
-     * @throws Exception if API call fails
      */
     protected abstract String callApi(String systemPrompt, String userMessage) throws Exception;
 }

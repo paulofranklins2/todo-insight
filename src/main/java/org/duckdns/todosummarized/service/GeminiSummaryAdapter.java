@@ -104,10 +104,6 @@ public class GeminiSummaryAdapter extends BaseAiSummaryAdapter {
 
     /**
      * Parses the Gemini API response and extracts the generated content.
-     *
-     * @param responseBody the raw JSON response body
-     * @return the extracted content text
-     * @throws Exception if response format is unexpected
      */
     private String parseGeminiResponse(String responseBody) throws Exception {
         JsonNode root = objectMapper.readTree(responseBody);

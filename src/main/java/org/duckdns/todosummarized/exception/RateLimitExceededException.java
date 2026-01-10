@@ -1,10 +1,12 @@
 package org.duckdns.todosummarized.exception;
 
+import lombok.Getter;
+
 /**
  * Exception thrown when a user exceeds the rate limit for an endpoint.
  */
+@Getter
 public class RateLimitExceededException extends RuntimeException {
-
     private final long retryAfterSeconds;
 
     public RateLimitExceededException(String message, long retryAfterSeconds) {
@@ -16,13 +18,5 @@ public class RateLimitExceededException extends RuntimeException {
         this("Rate limit exceeded. Please try again later.", retryAfterSeconds);
     }
 
-    /**
-     * Returns the number of seconds until the rate limit resets.
-     *
-     * @return seconds until retry is allowed
-     */
-    public long getRetryAfterSeconds() {
-        return retryAfterSeconds;
-    }
 }
 

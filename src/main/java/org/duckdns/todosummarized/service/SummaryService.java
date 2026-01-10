@@ -28,9 +28,6 @@ public class SummaryService {
     /**
      * Generates a daily summary of todos for the specified user with metrics and breakdowns.
      * Includes counts by status, priority, overdue items, and completion rate.
-     *
-     * @param user the authenticated user
-     * @return a {@link DailySummaryDTO} containing today's todo metrics for the user
      */
     @Transactional(readOnly = true)
     public DailySummaryDTO getDailySummary(User user) {
@@ -65,9 +62,6 @@ public class SummaryService {
     /**
      * Fetches todo counts grouped by status for the specified user in a single query.
      * Initializes all status values to 0 before populating from the database.
-     *
-     * @param user the user to filter by
-     * @return a map of {@link TaskStatus} to count
      */
     private Map<TaskStatus, Long> countsByStatus(User user) {
         EnumMap<TaskStatus, Long> counts = initEnumCounts(TaskStatus.class, TaskStatus.values());
@@ -79,9 +73,6 @@ public class SummaryService {
     /**
      * Fetches todo counts grouped by priority for the specified user in a single query.
      * Initializes all priority values to 0 before populating from the database.
-     *
-     * @param user the user to filter by
-     * @return a map of {@link TaskPriority} to count
      */
     private Map<TaskPriority, Long> countsByPriority(User user) {
         EnumMap<TaskPriority, Long> counts = initEnumCounts(TaskPriority.class, TaskPriority.values());
@@ -92,11 +83,6 @@ public class SummaryService {
 
     /**
      * Initializes an EnumMap with all enum values set to zero.
-     *
-     * @param type   the enum class type
-     * @param values all values of the enum
-     * @param <E>    the enum type
-     * @return an EnumMap with all keys initialized to 0L
      */
     private static <E extends Enum<E>> EnumMap<E, Long> initEnumCounts(Class<E> type, E[] values) {
         EnumMap<E, Long> counts = new EnumMap<>(type);
@@ -108,11 +94,6 @@ public class SummaryService {
 
     /**
      * Returns the value for the given key, or 0 if the key is not present.
-     *
-     * @param map the map to look up
-     * @param key the key to find
-     * @param <K> the key type
-     * @return the value or 0L if absent
      */
     private static <K> long getOrZero(Map<K, Long> map, K key) {
         return map.getOrDefault(key, 0L);
@@ -121,11 +102,6 @@ public class SummaryService {
     /**
      * Calculates the completion rate as a percentage of active (non-cancelled) todos.
      * Returns 0.0 if there are no active todos.
-     *
-     * @param totalTodos     total number of todos
-     * @param completedCount number of completed todos
-     * @param cancelledCount number of cancelled todos
-     * @return completion rate as a percentage (0.0 - 100.0), rounded to 2 decimal places
      */
     private static double completionRate(long totalTodos, long completedCount, long cancelledCount) {
         long activeTodos = Math.max(0, totalTodos - cancelledCount);
@@ -136,10 +112,6 @@ public class SummaryService {
     /**
      * Converts an enum-keyed map to a string-keyed map using enum names.
      * Preserves insertion order using LinkedHashMap.
-     *
-     * @param enumKeyed the map with enum keys
-     * @param <E>       the enum type
-     * @return a new map with enum names as keys
      */
     private static <E extends Enum<E>> Map<String, Long> toNameKeyedMap(Map<E, Long> enumKeyed) {
         Map<String, Long> out = new LinkedHashMap<>();
@@ -149,9 +121,6 @@ public class SummaryService {
 
     /**
      * Rounds a double value to 2 decimal places.
-     *
-     * @param value the value to round
-     * @return the rounded value
      */
     private static double round2(double value) {
         return Math.round(value * 100.0) / 100.0;
@@ -160,12 +129,6 @@ public class SummaryService {
     /**
      * Immutable record representing the time boundaries for daily summary calculations.
      * Contains the current time and date range boundaries for today, tomorrow, and upcoming period.
-     *
-     * @param now             the current date-time
-     * @param startOfDay      start of today (midnight)
-     * @param endOfDay        end of today (23:59:59.999...)
-     * @param startOfTomorrow start of tomorrow (midnight)
-     * @param endOfUpcoming   end of the upcoming period (UPCOMING_DAYS_AHEAD days from today)
      */
     private record SummaryWindow(
             LocalDateTime now,
@@ -176,10 +139,6 @@ public class SummaryService {
     ) {
         /**
          * Factory method to create a SummaryWindow for the given date.
-         *
-         * @param today the date to calculate boundaries for
-         * @param clock the clock to use for current time
-         * @return a new SummaryWindow with calculated boundaries
          */
         static SummaryWindow of(LocalDate today, Clock clock) {
             return new SummaryWindow(

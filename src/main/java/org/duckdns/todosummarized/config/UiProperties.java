@@ -18,26 +18,26 @@ public class UiProperties {
     /**
      * Application name displayed in UI.
      */
-    private String appName = "Todo Insight";
+    private String appName;
 
     /**
      * Application version.
      */
-    private String version = "1.0.0";
+    private String version;
 
     /**
      * Base API path.
      */
-    private String apiBase = "/api";
+    private String apiBase;
 
     /**
      * Default date format for display.
      */
-    private String dateFormat = "MMM dd, yyyy";
+    private String dateFormat;
 
     /**
      * Default date-time format for display.
      */
-    private String dateTimeFormat = "MMM dd, yyyy HH:mm";
+    private String dateTimeFormat;
 }
 

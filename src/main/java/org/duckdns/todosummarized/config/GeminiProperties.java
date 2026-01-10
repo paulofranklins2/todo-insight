@@ -20,7 +20,7 @@ public class GeminiProperties {
     /**
      * Gemini model to use.
      */
-    private String model = "gemini-2.5-flash-lite";
+    private String model;
 
     /**
      * Whether Gemini AI summary feature is enabled.

@@ -12,9 +12,6 @@ public class AiSummaryMessageBuilder {
 
     /**
      * Builds a user message containing todo metrics for AI summarization.
-     *
-     * @param metrics the daily summary metrics to format
-     * @return formatted message string for the AI
      */
     public String buildUserMessage(DailySummaryDTO metrics) {
         StringBuilder sb = new StringBuilder();
@@ -43,10 +40,6 @@ public class AiSummaryMessageBuilder {
     /**
      * Combines system prompt and user message for providers that don't support
      * separate system/user messages (like Gemini's simpler API).
-     *
-     * @param systemPrompt the system prompt/instructions
-     * @param userMessage  the user message with metrics
-     * @return combined prompt string
      */
     public String combinedPrompt(String systemPrompt, String userMessage) {
         return systemPrompt + "\n\n" + userMessage;

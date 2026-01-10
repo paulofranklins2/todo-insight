@@ -23,27 +23,16 @@ public interface TodoRepository extends JpaRepository<Todo, UUID>, JpaSpecificat
 
     /**
      * Find a todo by ID and user.
-     *
-     * @param id   the todo ID
-     * @param user the user who owns the todo
-     * @return the todo if found and owned by the user
      */
     Optional<Todo> findByIdAndUser(UUID id, User user);
 
     /**
      * Deletes the todo with the given id and user.
-     *
-     * @param id   the id of the todo to be deleted
-     * @param user the user who owns the todo
-     * @return the number of rows deleted
      */
     long deleteByIdAndUser(UUID id, User user);
 
     /**
      * Count todos by user.
-     *
-     * @param user the user
-     * @return the count
      */
     long countByUser(User user);
 

@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleRateLimitExceeded(RateLimitExceededException ex, HttpServletRequest request) {
         log.warn("Rate limit exceeded: {} - retry after {} seconds", ex.getMessage(), ex.getRetryAfterSeconds());
-        return buildWithRetryAfter(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request, ex.getRetryAfterSeconds());
+        return buildWithRetryAfter(ex.getMessage(), request, ex.getRetryAfterSeconds());
     }
 
     @ExceptionHandler(InvalidJwtTokenException.class)
@@ -137,20 +137,19 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> buildWithRetryAfter(
-            HttpStatus status,
             String message,
             HttpServletRequest request,
             long retryAfterSeconds
     ) {
         ErrorResponse body = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now(clock))
-                .status(status.value())
-                .error(status.getReasonPhrase())
+                .status(HttpStatus.TOO_MANY_REQUESTS.value())
+                .error(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase())
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(status)
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .header("Retry-After", String.valueOf(retryAfterSeconds))
                 .header("X-RateLimit-Retry-After-Seconds", String.valueOf(retryAfterSeconds))
                 .body(body);

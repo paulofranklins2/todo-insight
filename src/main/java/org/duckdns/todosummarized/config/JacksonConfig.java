@@ -14,8 +14,6 @@ public class JacksonConfig {
 
     /**
      * Creates and configures an ObjectMapper bean for JSON processing.
-     *
-     * @return configured ObjectMapper instance
      */
     @Bean
     public ObjectMapper objectMapper() {

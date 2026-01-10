@@ -56,11 +56,6 @@ public class AiProviderSelector {
     /**
      * Generates an AI summary using the configured provider.
      * Uses the global preferred provider setting, but can be overridden.
-     *
-     * @param metrics         the daily summary metrics
-     * @param summaryType     the type of summary to generate
-     * @param preferredProvider the preferred AI provider (or AUTO for automatic selection)
-     * @return the generation result with summary and provider info
      */
     public AiGenerationResult generateSummary(DailySummaryDTO metrics, SummaryType summaryType, AiProvider preferredProvider) {
         // Check if AI is globally disabled
@@ -146,8 +141,6 @@ public class AiProviderSelector {
     /**
      * Checks if any AI provider is currently available.
      * Takes into account the global AI enabled setting.
-     *
-     * @return true if AI is globally enabled and at least one provider is enabled
      */
     public boolean isAnyProviderAvailable() {
         if (!aiProperties.isEnabled()) {
@@ -159,9 +152,6 @@ public class AiProviderSelector {
     /**
      * Checks if a specific provider is available.
      * Takes into account the global AI enabled setting.
-     *
-     * @param provider the provider to check
-     * @return true if the provider is enabled and configured
      */
     public boolean isProviderAvailable(AiProvider provider) {
         if (!aiProperties.isEnabled()) {
@@ -195,8 +185,6 @@ public class AiProviderSelector {
 
     /**
      * Gets information about available providers for the API.
-     *
-     * @return array of provider availability info
      */
     public ProviderInfo[] getProviderInfo() {
         boolean globalEnabled = aiProperties.isEnabled();
@@ -208,8 +196,6 @@ public class AiProviderSelector {
 
     /**
      * Gets the globally configured preferred provider.
-     *
-     * @return the configured AI provider preference
      */
     public AiProvider getConfiguredProvider() {
         return aiProperties.getProvider();
@@ -217,8 +203,6 @@ public class AiProviderSelector {
 
     /**
      * Checks if AI is globally enabled.
-     *
-     * @return true if AI feature is globally enabled
      */
     public boolean isGloballyEnabled() {
         return aiProperties.isEnabled();
