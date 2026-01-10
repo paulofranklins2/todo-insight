@@ -10,117 +10,68 @@
 <nav th:replace="~{fragments/navbar :: navbar('dashboard')}"></nav>
 
 <main class="main-content">
-    <div class="container">
+    <div class="dashboard-container">
 
-        <!-- Stats Dropdown & AI Insights Button -->
-        <div class="dashboard-header mb-4">
-            <button class="btn btn-secondary stats-toggle" id="statsToggleBtn">
-                <span>Stats</span>
-                <svg class="stats-toggle-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M4 6l4 4 4-4"/>
+        <!-- Header Actions -->
+        <div class="dashboard-actions">
+            <button class="btn btn-secondary" id="statsBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
                 </svg>
+                <span>Stats</span>
             </button>
             <button class="btn btn-primary" id="aiInsightsBtn">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/>
-                    <circle cx="8" cy="14" r="2"/>
-                    <circle cx="16" cy="14" r="2"/>
                 </svg>
                 <span>AI Insights</span>
             </button>
         </div>
 
-        <!-- Collapsible Stats Panel -->
-        <div class="stats-panel hidden" id="statsPanel">
-            <div class="stats-grid-compact">
-                <div class="stat-item">
-                    <span class="stat-value" id="metricTotal">-</span>
-                    <span class="stat-label">Total</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value text-success" id="metricCompleted">-</span>
-                    <span class="stat-label">Done</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value text-danger" id="metricOverdue">-</span>
-                    <span class="stat-label">Overdue</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value text-success" id="metricCompletionRate">-%</span>
-                    <span class="stat-label">Rate</span>
-                </div>
-            </div>
-
-            <div class="stats-breakdown">
-                <div class="breakdown-section">
-                    <h4>By Status</h4>
-                    <div id="statusBreakdown" class="breakdown-list"></div>
-                </div>
-                <div class="breakdown-section">
-                    <h4>By Priority</h4>
-                    <div id="priorityBreakdown" class="breakdown-list"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add Todo Form -->
-        <div class="add-todo-bar">
-            <input type="text" id="quickAddInput" class="form-control" placeholder="Add a new task..." maxlength="255">
-            <button class="btn btn-primary" id="quickAddBtn">Add</button>
+        <!-- Quick Add Task -->
+        <div class="quick-add">
+            <input type="text" id="quickAddInput" class="quick-add-input" placeholder="What needs to be done?"
+                   maxlength="255">
+            <button class="btn btn-primary quick-add-btn" id="quickAddBtn">Add Task</button>
         </div>
 
         <!-- Filters -->
-        <div class="filters-bar">
-            <div class="filter-group">
-                <label>Status</label>
-                <select id="filterStatus" class="form-control"></select>
-            </div>
-            <div class="filter-group">
-                <label>Priority</label>
-                <select id="filterPriority" class="form-control"></select>
-            </div>
-            <button class="btn btn-ghost btn-sm" id="clearFiltersBtn">Clear</button>
+        <div class="filters-row">
+            <select id="filterStatus" class="filter-select" aria-label="Filter by status"></select>
+            <select id="filterPriority" class="filter-select" aria-label="Filter by priority"></select>
+            <button class="btn btn-ghost btn-sm" id="clearFiltersBtn">Clear filters</button>
         </div>
 
-        <!-- Todos List -->
-        <div class="card">
-            <div class="card-body" style="padding: 0;">
-                <div class="table-container">
-                    <table class="table" id="todosTable">
-                        <thead>
-                        <tr>
-                            <th style="width: 40px;"></th>
-                            <th>Task</th>
-                            <th>Priority</th>
-                            <th>Due</th>
-                        </tr>
-                        </thead>
-                        <tbody id="todosBody"></tbody>
-                    </table>
-                </div>
+        <!-- Todo List -->
+        <div class="todo-list" id="todoList"></div>
 
-                <div id="emptyState" class="hidden">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"></div>
-                        <h3 class="empty-state-title">No tasks yet</h3>
-                        <p class="empty-state-message">Add your first task above.</p>
-                    </div>
-                </div>
-
-                <div id="loadingState" class="hidden">
-                    <div class="empty-state">
-                        <div class="spinner"></div>
-                    </div>
-                </div>
-
-                <div id="paginationContainer"></div>
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden">
+            <div class="empty-todo-state">
+                <h3>No tasks yet</h3>
+                <p>Add your first task above to get started.</p>
             </div>
         </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden">
+            <div class="loading-state">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer"></div>
     </div>
 </main>
 
 <!-- Todo Modals -->
 <div th:replace="~{fragments/todo-modal :: modals}"></div>
+
+<!-- Stats Modal -->
+<div th:replace="~{fragments/stats-modal :: modal}"></div>
 
 <!-- AI Insights Modal -->
 <div th:replace="~{fragments/ai-insights-modal :: modal}"></div>
@@ -134,6 +85,7 @@
 <script th:src="@{/js/auth.js}"></script>
 <script th:src="@{/js/utils.js}"></script>
 <script th:replace="~{fragments/todo-modal :: modal-scripts}"></script>
+<script th:replace="~{fragments/stats-modal :: modal-scripts}"></script>
 <script th:replace="~{fragments/ai-insights-modal :: modal-scripts}"></script>
 <script>
     let currentPage = 0;
@@ -145,6 +97,7 @@
         await loadDropdowns();
         setupEventListeners();
         initTodoModals();
+        StatsModal.init();
         AiInsights.init();
         await loadData();
     });
@@ -154,8 +107,8 @@
             DropdownLoader.loadStatuses(),
             DropdownLoader.loadPriorities()
         ]);
-        DropdownLoader.populateSelect(document.getElementById('filterStatus'), statuses, true, 'All');
-        DropdownLoader.populateSelect(document.getElementById('filterPriority'), priorities, true, 'All');
+        DropdownLoader.populateSelect(document.getElementById('filterStatus'), statuses, true, 'All Status');
+        DropdownLoader.populateSelect(document.getElementById('filterPriority'), priorities, true, 'All Priority');
         DropdownLoader.populateSelect(document.getElementById('status'), statuses);
         DropdownLoader.populateSelect(document.getElementById('priority'), priorities);
     }
@@ -168,71 +121,21 @@
         document.getElementById('filterStatus').addEventListener('change', handleFilterChange);
         document.getElementById('filterPriority').addEventListener('change', handleFilterChange);
         document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-
-        // Stats toggle
-        document.getElementById('statsToggleBtn').addEventListener('click', toggleStats);
-
-        // AI Insights button
+        document.getElementById('statsBtn').addEventListener('click', () => StatsModal.open());
         document.getElementById('aiInsightsBtn').addEventListener('click', () => AiInsights.open());
     }
 
-    function toggleStats() {
-        const panel = document.getElementById('statsPanel');
-        const btn = document.getElementById('statsToggleBtn');
-        const isHidden = panel.classList.contains('hidden');
-
-        panel.classList.toggle('hidden');
-        btn.classList.toggle('active', isHidden);
-
-        if (isHidden) {
-            loadDailySummary();
-        }
-    }
-
-    async function loadDailySummary() {
-        try {
-            const s = await Api.summary.daily();
-            document.getElementById('metricTotal').textContent = s.totalTodos;
-            document.getElementById('metricCompleted').textContent = s.completedCount;
-            document.getElementById('metricOverdue').textContent = s.overdueCount;
-            document.getElementById('metricCompletionRate').textContent = s.completionRate.toFixed(0) + '%';
-            renderBreakdown('statusBreakdown', s.byStatus, 'status');
-            renderBreakdown('priorityBreakdown', s.byPriority, 'priority');
-        } catch (e) {
-            Toast.error('Failed to load stats');
-        }
-    }
-
-    function renderBreakdown(id, data, type) {
-        const el = document.getElementById(id);
-        if (!data || Object.keys(data).length === 0) {
-            el.innerHTML = '<p class="text-muted">No data</p>';
-            return;
-        }
-        const total = Object.values(data).reduce((a, b) => a + b, 0);
-        el.innerHTML = Object.entries(data)
-            .sort((a, b) => b[1] - a[1])
-            .map(([key, value]) => {
-                const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
-                const cls = type === 'status' ? `badge-status-${key.toLowerCase()}` : `badge-priority-${key.toLowerCase()}`;
-                return `
-                        <div class="breakdown-item">
-                            <span class="badge ${cls}">${Utils.formatEnumLabel(key)}</span>
-                            <span class="text-muted">${value} (${pct}%)</span>
-                        </div>`;
-            }).join('');
-    }
 
     async function loadData() {
         await loadTodos();
     }
 
     async function loadTodos() {
-        const table = document.getElementById('todosTable');
+        const todoList = document.getElementById('todoList');
         const emptyState = document.getElementById('emptyState');
         const loadingState = document.getElementById('loadingState');
 
-        table.classList.add('hidden');
+        todoList.innerHTML = '';
         emptyState.classList.add('hidden');
         loadingState.classList.remove('hidden');
 
@@ -247,7 +150,6 @@
                 return;
             }
 
-            table.classList.remove('hidden');
             renderTodos(page.content);
             renderPagination(page);
         } catch (error) {
@@ -263,30 +165,33 @@
             return aCompleted - bCompleted;
         });
 
-        document.getElementById('todosBody').innerHTML = sortedTodos.map(todo => {
+        const todoList = document.getElementById('todoList');
+        todoList.innerHTML = sortedTodos.map(todo => {
             const isCompleted = todo.status === 'COMPLETED';
             const isCancelled = todo.status === 'CANCELLED';
             const dueIndicator = Utils.getDueIndicator(todo.dueDate, todo.status);
-            const dueIndicatorHtml = dueIndicator ? `<span class="due-indicator due-indicator-${dueIndicator}"></span>` : '';
 
             return `
-                <tr class="${isCompleted ? 'todo-completed' : ''} todo-row-clickable" onclick="openTodoModal('${todo.id}')">
-                    <td data-label="Done" class="todo-checkbox-cell" onclick="event.stopPropagation()">
-                        <label class="todo-checkbox ${isCancelled ? 'disabled' : ''}">
-                            <input type="checkbox"
-                                   ${isCompleted ? 'checked' : ''}
-                                   ${isCancelled ? 'disabled' : ''}
-                                   onchange="toggleTodoStatus('${todo.id}', this.checked)">
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td data-label="Task">
-                        <span class="${isCompleted ? 'todo-title-done' : ''}">${Utils.escapeHtml(todo.title)}</span>${dueIndicatorHtml}${todo.description ? `<br><small class="text-muted">${Utils.escapeHtml(todo.description.substring(0, 50))}${todo.description.length > 50 ? '...' : ''}</small>` : ''}
-                    </td>
-                    <td data-label="Priority">${Components.priorityBadge(todo.priority)}</td>
-                    <td data-label="Due" class="${dueIndicator === 'overdue' ? 'text-danger' : dueIndicator === 'today' ? 'text-warning' : 'text-muted'}">${Utils.formatDate(todo.dueDate)}</td>
-                </tr>
-            `
+                <div class="todo-item ${isCompleted ? 'completed' : ''}" onclick="openTodoModal('${todo.id}')">
+                    <div class="todo-check ${isCompleted ? 'checked' : ''} ${isCancelled ? 'disabled' : ''}"
+                         onclick="event.stopPropagation(); toggleTodoStatus('${todo.id}', ${!isCompleted})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="todo-content">
+                        <div class="todo-title ${isCompleted ? 'done' : ''}">
+                            ${Utils.escapeHtml(todo.title)}
+                            ${dueIndicator ? `<span class="due-dot ${dueIndicator}"></span>` : ''}
+                        </div>
+                        ${todo.description ? `<div class="todo-description">${Utils.escapeHtml(todo.description.substring(0, 60))}${todo.description.length > 60 ? '...' : ''}</div>` : ''}
+                    </div>
+                    <div class="todo-meta">
+                        <span class="badge badge-priority-${todo.priority.toLowerCase()}">${Utils.formatEnumLabel(todo.priority)}</span>
+                        ${todo.dueDate ? `<span class="todo-due ${dueIndicator || ''}">${Utils.formatDate(todo.dueDate)}</span>` : ''}
+                    </div>
+                </div>
+            `;
         }).join('');
     }
 
@@ -296,7 +201,26 @@
             container.innerHTML = '';
             return;
         }
-        container.innerHTML = Components.pagination(page);
+
+        let buttons = '';
+
+        // Previous button
+        buttons += `<button class="page-btn" data-page="${page.number - 1}" ${page.first ? 'disabled' : ''}>←</button>`;
+
+        // Page numbers
+        for (let i = 0; i < page.totalPages; i++) {
+            if (i === 0 || i === page.totalPages - 1 || Math.abs(i - page.number) <= 1) {
+                buttons += `<button class="page-btn ${i === page.number ? 'active' : ''}" data-page="${i}">${i + 1}</button>`;
+            } else if (Math.abs(i - page.number) === 2) {
+                buttons += `<span style="padding: 0 var(--space-2);">...</span>`;
+            }
+        }
+
+        // Next button
+        buttons += `<button class="page-btn" data-page="${page.number + 1}" ${page.last ? 'disabled' : ''}>→</button>`;
+
+        container.innerHTML = `<div class="pagination-row">${buttons}</div>`;
+
         container.querySelectorAll('.page-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const pageNum = parseInt(btn.dataset.page);
@@ -328,9 +252,9 @@
         }
     }
 
-    async function toggleTodoStatus(id, isChecked) {
+    async function toggleTodoStatus(id, setCompleted) {
         try {
-            await Api.todos.updateStatus(id, isChecked ? 'COMPLETED' : 'NOT_STARTED');
+            await Api.todos.updateStatus(id, setCompleted ? 'COMPLETED' : 'NOT_STARTED');
             await loadData();
         } catch (error) {
             Toast.error('Failed to update');

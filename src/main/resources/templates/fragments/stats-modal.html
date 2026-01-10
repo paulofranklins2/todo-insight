@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<th:block th:fragment="modal">
+    <!-- Stats Modal -->
+    <div class="modal-overlay" id="statsModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Statistics</h2>
+                <button class="modal-close" id="statsModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="value" id="metricTotal">-</span>
+                        <span class="label">Total</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="value text-success" id="metricCompleted">-</span>
+                        <span class="label">Done</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="value text-danger" id="metricOverdue">-</span>
+                        <span class="label">Overdue</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="value text-success" id="metricCompletionRate">-%</span>
+                        <span class="label">Rate</span>
+                    </div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="breakdown-col">
+                        <h4>By Status</h4>
+                        <div id="statusBreakdown"></div>
+                    </div>
+                    <div class="breakdown-col">
+                        <h4>By Priority</h4>
+                        <div id="priorityBreakdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="modal-scripts">
+    <script>
+        const StatsModal = (() => {
+            let isInitialized = false;
+            let isLoaded = false;
+
+            const init = () => {
+                if (isInitialized) return;
+                isInitialized = true;
+
+                const modal = document.getElementById('statsModal');
+                const closeBtn = document.getElementById('statsModalCloseBtn');
+
+                if (!modal) return;
+
+                closeBtn?.addEventListener('click', close);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) close();
+                });
+            };
+
+            const open = () => {
+                const modal = document.getElementById('statsModal');
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    if (!isLoaded) {
+                        loadStats();
+                    }
+                }
+            };
+
+            const close = () => {
+                const modal = document.getElementById('statsModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            };
+
+            const loadStats = async () => {
+                try {
+                    const s = await Api.summary.daily();
+                    document.getElementById('metricTotal').textContent = s.totalTodos;
+                    document.getElementById('metricCompleted').textContent = s.completedCount;
+                    document.getElementById('metricOverdue').textContent = s.overdueCount;
+                    document.getElementById('metricCompletionRate').textContent = s.completionRate.toFixed(0) + '%';
+                    renderBreakdown('statusBreakdown', s.byStatus, 'status');
+                    renderBreakdown('priorityBreakdown', s.byPriority, 'priority');
+                    isLoaded = true;
+                } catch (e) {
+                    Toast.error('Failed to load stats');
+                }
+            };
+
+            const renderBreakdown = (id, data, type) => {
+                const el = document.getElementById(id);
+                if (!data || Object.keys(data).length === 0) {
+                    el.innerHTML = '<p class="text-muted">No data</p>';
+                    return;
+                }
+                const total = Object.values(data).reduce((a, b) => a + b, 0);
+                el.innerHTML = Object.entries(data)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([key, value]) => {
+                        const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                        const cls = type === 'status' ? `badge-status-${key.toLowerCase()}` : `badge-priority-${key.toLowerCase()}`;
+                        return `<div class="breakdown-item">
+                            <span class="badge ${cls}">${Utils.formatEnumLabel(key)}</span>
+                            <span class="text-muted">${value} (${pct}%)</span>
+                        </div>`;
+                    }).join('');
+            };
+
+            const refresh = () => {
+                isLoaded = false;
+                loadStats();
+            };
+
+            return { init, open, close, refresh };
+        })();
+    </script>
+</th:block>
+</body>
+</html>
+
