@@ -48,14 +48,19 @@ A modern, full-stack Todo application with AI-powered insights. Built with Sprin
 
 ## 📸 Screenshots
 
+<details>
+<summary><strong>🖥️ Desktop Screenshots</strong></summary>
+
 ### Landing Page
-* Clean, modern landing page showcasing features with login/register modals.
+Clean, modern landing page showcasing features with login/register modals.
+
 ![Landing Page 1](docs/images/landing-page-1.png)
 ![Landing Page 2](docs/images/landing-page-2.png)
 ![Landing Page 3](docs/images/landing-page-3.png)
 
 ### Dashboard
-* Compact todo list with integrated filters, quick-add, and action buttons.
+Compact todo list with integrated filters, quick-add, and action buttons.
+
 ![Dashboard 1](docs/images/dashboard-1.png)
 ![Dashboard 2](docs/images/dashboard-2.png)
 ![Dashboard 3](docs/images/dashboard-3.png)
@@ -64,12 +69,17 @@ A modern, full-stack Todo application with AI-powered insights. Built with Sprin
 ![Dashboard 6](docs/images/dashboard-6.png)
 
 ### AI Insights
-* AI-generated productivity insights with markdown formatting.
+AI-generated productivity insights with markdown formatting.
+
 ![AI Insights 1](docs/images/ai-insights-1.png)
 ![AI Insights 2](docs/images/ai-insights-2.png)
 
-### Mobile
-* Responsive design for seamless mobile experience.
+</details>
+
+<details>
+<summary><strong>📱 Mobile Screenshots</strong></summary>
+
+Responsive design for seamless mobile experience.
 
 ![Mobile 1](docs/images/mobile-1.png)
 ![Mobile 2](docs/images/mobile-2.png)
@@ -79,6 +89,8 @@ A modern, full-stack Todo application with AI-powered insights. Built with Sprin
 ![Mobile 6](docs/images/mobile-6.png)
 ![Mobile 7](docs/images/mobile-7.png)
 ![Mobile 8](docs/images/mobile-8.png)
+
+</details>
 ---
 
 ## 📚 API Documentation
