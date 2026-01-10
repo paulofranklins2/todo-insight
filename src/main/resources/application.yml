@@ -21,3 +21,19 @@ spring:
       pageable:
         default-page-size: 20
         max-page-size: 20
+
+  # Thymeleaf configuration
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+
+# Application UI Configuration
+app:
+  ui:
+    app-name: Todo Summarized
+    version: 1.0.0
+    api-base: /api
+    date-format: MMM dd, yyyy
+    date-time-format: MMM dd, yyyy HH:mm
