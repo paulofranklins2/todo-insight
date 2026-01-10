@@ -1,65 +1,83 @@
-# Scaffolding TODO list
-
----
-
 # Todo Summarized – TODO
 
-**Last updated:** 2026-01-09
-
 ---
 
-## P0 – Core (Critical)
+# Project Status Overview
+
+## P0 – Core Backend (Complete)
 
 * [x] Initialize Spring Boot project
-* [x] Keep README setup instructions accurate
-* [x] Create TODO.md
-* [x] Add dependencies
-* [x] Define Todo entity
-* [x] Define enums
+* [x] Define Todo entity with JPA
+* [x] Define enums (TaskStatus, TaskPriority, Role)
 * [x] CRUD REST endpoints for todos
-* [x] Swagger/OpenAPI documentation for all endpoints
-* [x] Validation rules
-* [x] Daily summary endpoint
-* [x] AI summary adapter
-* [x] Metrics-only fallback if AI fails or is disabled
-* [x] Global exception handling with structured error responses
-* [x] Swagger security schemes configured
+* [x] Swagger/OpenAPI documentation
+* [x] Validation rules (Jakarta Validation)
+* [x] Daily summary endpoint with metrics
+* [x] AI summary integration (OpenAI/Gemini)
+* [x] Metrics-only fallback if AI fails
+* [x] Global exception handling
+* [x] Rate limiting for AI endpoints
 
 ---
 
-## P1 – Enhancements
+## P1 – Authentication & Security (Complete)
 
-* [x] Request/response DTOs
-* [x] TodoMapper
-* [x] Pagination for `GET /todos`
-* [x] Filtering
-    * [x] Status
-    * [x] Priority
-    * [x] Due date range
-    * [x] Overdue
-    * [x] Upcoming
-* [x] Audit fields (createdAt, updatedAt)
-* [x] Rate limiting for summary endpoint
-
----
-
-## P2 – Future
-
-* [ ] Simple Thymeleaf UI
 * [x] Spring Security configuration
 * [x] User registration and login endpoints
-* [x] User roles
-* [x] JWT authentication
-* [ ] Tags / categories
-* [ ] Weekly summary endpoint
-* [ ] Cache daily summaries
-* [ ] Actuator (health, info, metrics)
-* [ ] Deploy to hosting
-* [ ] GitHub Actions CI/CD
+* [x] BCrypt password encoding
+* [x] Session-based authentication
+* [x] HTTP Basic for API testing
+* [x] Role-based authorization (USER, ADMIN)
+* [x] User-scoped todo access
+* [x] CSRF protection for web, disabled for API
 
 ---
 
-## Testing
+## P2 – Frontend UI (Complete)
+
+* [x] Landing page with feature showcase
+* [x] Login/Register modals (no separate pages)
+* [x] Dashboard with todo list
+* [x] Quick-add todo input
+* [x] Filters (status, priority)
+* [x] Todo detail/edit modal
+* [x] Stats modal with metrics breakdown
+* [x] AI Insights modal with markdown rendering
+* [x] Responsive design (mobile-first)
+* [x] Clean, modern UI with CSS variables
+* [x] Toast notifications
+* [x] Loading states and spinners
+* [x] Dashboard footer
+
+---
+
+## P3 – Enhancements (Complete)
+
+* [x] Request/response DTOs
+* [x] TodoMapper for entity conversion
+* [x] Pagination for todo list
+* [x] Filtering by status, priority, due date
+* [x] Overdue and upcoming filters
+* [x] Audit fields (createdAt, updatedAt)
+* [x] Multi-provider AI support (OpenAI, Gemini)
+* [x] Graceful AI fallback
+
+---
+
+## P4 – Future Enhancements
+
+* [ ] Add cache to avoid db pulls
+* [ ] Tags / categories for todos
+* [ ] Cache daily summaries (Redis)
+* [ ] Actuator endpoints (health, info, metrics)
+* [ ] Dark mode theme
+* [ ] Export todos (CSV, JSON)
+* [ ] GitHub Actions CI/CD
+* [ ] Docker containerization
+
+---
+
+## Testing Coverage
 
 * [x] TodoMapper unit tests
 * [x] GlobalExceptionHandler tests
@@ -71,32 +89,8 @@
 * [x] SummaryController tests
 * [x] AuthController tests
 * [x] CustomUserDetailsService tests
+* [x] AiProviderSelector tests
+* [x] Rate limiting tests
 
 ---
 
-## Implemented (Quick Reference)
-
-### Authentication
-
-* [x] User signup and signing
-* [x] BCrypt password encoding
-* [x] Form login
-* [x] HTTP Basic (API testing)
-* [x] Role-based authorization
-* [x] CSRF disabled for API
-
-### Todos
-
-* [x] User-scoped CRUD
-* [x] Status update (PATCH)
-* [x] Search and filtering
-* [x] Pagination
-
-### Daily Summary
-
-* [x] Status counts
-* [x] Priority counts
-* [x] Overdue count
-* [x] Upcoming count
-* [x] Due today count
-* [x] Completion rate
