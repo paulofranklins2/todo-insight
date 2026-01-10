@@ -52,14 +52,5 @@ public class WebController {
     public String dashboardPage() {
         return "dashboard";
     }
-
-
-    /**
-     * Summary page - requires authentication.
-     */
-    @GetMapping("/summary")
-    public String summaryPage() {
-        return "summary";
-    }
 }
 
