@@ -52,12 +52,7 @@ public class SummaryController {
             description = "Summary retrieved successfully",
             content = @Content(schema = @Schema(implementation = DailySummaryDTO.class))
     )
-    @ApiResponse(
-            responseCode = "429",
-            description = "Rate limit exceeded"
-    )
     @GetMapping("/daily")
-    @RateLimit(key = "daily-summary")
     public ResponseEntity<DailySummaryDTO> getDailySummary(@AuthenticationPrincipal User user) {
         DailySummaryDTO summary = summaryService.getDailySummary(user);
         return ResponseEntity.ok(summary);
