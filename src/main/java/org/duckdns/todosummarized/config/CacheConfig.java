@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class CacheConfig {
 
     /**
-     * User cache with O(1) lookup by email.
+     * User cache with lookup by email.
      * - Maximum 10,000 entries
      * - Entries expire 15 minutes after last access
      * - Entries expire 1 hour after creation (to refresh from DB periodically)
@@ -33,7 +33,7 @@ public class CacheConfig {
     }
 
     /**
-     * Todo search results cache with O(1) lookup.
+     * Todo search results cache
      * - Maximum 5,000 entries (search results per user/query combination)
      * - Entries expire 30 seconds after write (short TTL for freshness)
      * - Entries expire 1 minute after last access

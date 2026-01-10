@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * Spring Security adapter responsible for loading users by email.
- * In this application, email is used as the authentication username.
- * Uses cached user lookup for O(1) access time on repeated requests.
  */
 @Service
 @RequiredArgsConstructor
