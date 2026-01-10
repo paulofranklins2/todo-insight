@@ -21,7 +21,7 @@ import java.util.Locale;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final UserCacheService userCacheService;
+    private final CacheService cacheService;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -38,7 +38,7 @@ public class UserService {
         User user = toNewUser(email, userRegistrationDTO.getPassword());
         User savedUser = userRepository.save(user);
 
-        userCacheService.put(savedUser);
+        cacheService.putUser(savedUser);
 
         return UserResponseDTO.fromEntity(savedUser);
     }
@@ -48,7 +48,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserResponseDTO getUserProfile(String email) {
-        User user = userCacheService.findByEmail(normalizeEmail(email))
+        User user = cacheService.findUserByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return UserResponseDTO.fromEntity(user);
     }

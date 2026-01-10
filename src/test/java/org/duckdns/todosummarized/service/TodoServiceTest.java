@@ -43,14 +43,15 @@ class TodoServiceTest {
     @Mock
     private TodoRepository todoRepository;
 
-    private Clock fixedClock;
+    @Mock
+    private CacheService cacheService;
+
     private TodoService todoService;
     private User user;
 
     @BeforeEach
     void setUp() {
-        fixedClock = Clock.fixed(Instant.parse("2026-01-08T12:00:00Z"), ZoneId.of("UTC"));
-        todoService = new TodoService(todoRepository, fixedClock);
+        todoService = new TodoService(todoRepository, cacheService);
         user = User.builder()
                 .id(UUID.randomUUID())
                 .email("test@example.com")
@@ -389,7 +390,7 @@ class TodoServiceTest {
             todo2.setUser(user);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(todo1, todo2), pageable, 2);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -398,7 +399,7 @@ class TodoServiceTest {
             assertNotNull(result);
             assertEquals(2, result.getTotalElements());
             assertEquals(2, result.getContent().size());
-            verify(todoRepository).findAll(any(Specification.class), eq(pageable));
+            verify(cacheService).searchTodos(query, pageable, user);
         }
 
         @Test
@@ -415,7 +416,7 @@ class TodoServiceTest {
             todo.setUser(user);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(todo), pageable, 1);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -423,7 +424,7 @@ class TodoServiceTest {
             // Then
             assertNotNull(result);
             assertEquals(1, result.getTotalElements());
-            verify(todoRepository).findAll(any(Specification.class), eq(pageable));
+            verify(cacheService).searchTodos(query, pageable, user);
         }
 
         @Test
@@ -434,7 +435,7 @@ class TodoServiceTest {
             Pageable pageable = PageRequest.of(0, 5);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(), pageable, 0);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -461,7 +462,7 @@ class TodoServiceTest {
             todo.setUser(user);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(todo), pageable, 1);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -485,7 +486,7 @@ class TodoServiceTest {
             overdueTodo.setUser(user);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(overdueTodo), pageable, 1);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -509,7 +510,7 @@ class TodoServiceTest {
             upcomingTodo.setUser(user);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(upcomingTodo), pageable, 1);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -534,7 +535,7 @@ class TodoServiceTest {
             Pageable pageable = PageRequest.of(0, 20);
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(), pageable, 0);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);
@@ -552,7 +553,7 @@ class TodoServiceTest {
             Pageable pageable = PageRequest.of(2, 5); // Page 2, size 5
 
             Page<Todo> expectedPage = new PageImpl<>(List.of(), pageable, 25);
-            when(todoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(expectedPage);
+            when(cacheService.searchTodos(query, pageable, user)).thenReturn(expectedPage);
 
             // When
             Page<Todo> result = todoService.search(query, pageable, user);

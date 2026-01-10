@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Configuration for in-memory caching using Caffeine.
- * Provides O(1) lookup time for cached entities.
  */
 @Configuration
 public class CacheConfig {

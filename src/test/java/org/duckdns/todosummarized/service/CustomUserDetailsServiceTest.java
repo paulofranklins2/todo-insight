@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 class CustomUserDetailsServiceTest {
 
     @Mock
-    private UserCacheService userCacheService;
+    private CacheService cacheService;
 
     private CustomUserDetailsService customUserDetailsService;
 
@@ -38,7 +38,7 @@ class CustomUserDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
-        customUserDetailsService = new CustomUserDetailsService(userCacheService);
+        customUserDetailsService = new CustomUserDetailsService(cacheService);
     }
 
     private User createTestUser() {
@@ -65,7 +65,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnUserDetailsWhenUserExists() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -74,14 +74,14 @@ class CustomUserDetailsServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getUsername()).isEqualTo(TEST_EMAIL);
             assertThat(result.getPassword()).isEqualTo(TEST_PASSWORD);
-            verify(userCacheService).findByEmail(TEST_EMAIL);
+            verify(cacheService).findUserByEmail(TEST_EMAIL);
         }
 
         @Test
         @DisplayName("should throw UsernameNotFoundException when user not found")
         void shouldThrowExceptionWhenUserNotFound() {
             // Given
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
 
             // When/Then
             assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(TEST_EMAIL))
@@ -89,7 +89,7 @@ class CustomUserDetailsServiceTest {
                     .hasMessageContaining(TEST_EMAIL)
                     .hasMessageContaining("User not found with email:");
 
-            verify(userCacheService).findByEmail(TEST_EMAIL);
+            verify(cacheService).findUserByEmail(TEST_EMAIL);
         }
 
         @Test
@@ -97,7 +97,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnEnabledStatusCorrectly() {
             // Given
             User enabledUser = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(enabledUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(enabledUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -122,7 +122,7 @@ class CustomUserDetailsServiceTest {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(disabledUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(disabledUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -136,7 +136,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnAccountNonExpiredStatusCorrectly() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -161,7 +161,7 @@ class CustomUserDetailsServiceTest {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(expiredUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(expiredUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -175,7 +175,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnAccountNonLockedStatusCorrectly() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -200,7 +200,7 @@ class CustomUserDetailsServiceTest {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(lockedUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(lockedUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -214,7 +214,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnCredentialsNonExpiredStatusCorrectly() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -239,7 +239,7 @@ class CustomUserDetailsServiceTest {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(credentialsExpiredUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(credentialsExpiredUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -253,7 +253,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnCorrectAuthoritiesForRoleUser() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -281,7 +281,7 @@ class CustomUserDetailsServiceTest {
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .build();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(adminUser));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(adminUser));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);
@@ -298,14 +298,14 @@ class CustomUserDetailsServiceTest {
         @ValueSource(strings = {"user@domain.com", "admin@test.org", "test.user@example.net"})
         void shouldSearchWithExactEmailProvided(String email) {
             // Given
-            when(userCacheService.findByEmail(email)).thenReturn(Optional.empty());
+            when(cacheService.findUserByEmail(email)).thenReturn(Optional.empty());
 
             // When/Then
             assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(email))
                     .isInstanceOf(UsernameNotFoundException.class)
                     .hasMessageContaining(email);
 
-            verify(userCacheService).findByEmail(email);
+            verify(cacheService).findUserByEmail(email);
         }
 
         @ParameterizedTest
@@ -313,13 +313,13 @@ class CustomUserDetailsServiceTest {
         @NullAndEmptySource
         void shouldThrowExceptionForNullOrEmptyEmail(String email) {
             // Given
-            when(userCacheService.findByEmail(email)).thenReturn(Optional.empty());
+            when(cacheService.findUserByEmail(email)).thenReturn(Optional.empty());
 
             // When/Then
             assertThatThrownBy(() -> customUserDetailsService.loadUserByUsername(email))
                     .isInstanceOf(UsernameNotFoundException.class);
 
-            verify(userCacheService).findByEmail(email);
+            verify(cacheService).findUserByEmail(email);
         }
 
         @Test
@@ -327,14 +327,14 @@ class CustomUserDetailsServiceTest {
         void shouldCallCacheServiceExactlyOnce() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             customUserDetailsService.loadUserByUsername(TEST_EMAIL);
 
             // Then
-            verify(userCacheService, times(1)).findByEmail(TEST_EMAIL);
-            verifyNoMoreInteractions(userCacheService);
+            verify(cacheService, times(1)).findUserByEmail(TEST_EMAIL);
+            verifyNoMoreInteractions(cacheService);
         }
 
         @Test
@@ -342,7 +342,7 @@ class CustomUserDetailsServiceTest {
         void shouldReturnUserInstanceImplementingUserDetails() {
             // Given
             User user = createTestUser();
-            when(userCacheService.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
+            when(cacheService.findUserByEmail(TEST_EMAIL)).thenReturn(Optional.of(user));
 
             // When
             UserDetails result = customUserDetailsService.loadUserByUsername(TEST_EMAIL);

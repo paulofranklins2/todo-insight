@@ -17,11 +17,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private static final String USER_NOT_FOUND = "User not found with email: ";
 
-    private final UserCacheService userCacheService;
+    private final CacheService cacheService;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        return userCacheService.findByEmail(email)
+        return cacheService.findUserByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND + email));
     }
 }
