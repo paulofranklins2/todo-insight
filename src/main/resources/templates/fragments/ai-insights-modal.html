@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<th:block th:fragment="modal">
+    <!-- AI Insights Modal -->
+    <div class="modal-overlay" id="aiInsightsModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>AI Insights</h2>
+                <button class="modal-close" id="aiInsightsCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="flex gap-2 mb-4" style="flex-wrap: wrap;">
+                    <select id="aiSummaryType" class="form-control" style="flex: 1; min-width: 150px;" aria-label="Summary type"></select>
+                    <button class="btn btn-primary" id="generateAiSummaryBtn">Generate</button>
+                </div>
+
+                <div id="aiInsightsContainer">
+                    <div class="empty-state" id="aiInsightsPlaceholder" style="padding: var(--space-6);">
+                        <p class="text-muted">Select a style and generate AI insights about your tasks.</p>
+                    </div>
+                </div>
+
+                <div id="aiStatusIndicator" class="mt-4" style="text-align: center;">
+                    <span class="text-muted" style="font-size: var(--text-sm);">AI Status: </span>
+                    <span id="aiStatusText" style="font-size: var(--text-sm);">Checking...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="modal-scripts">
+    <script>
+        // AI Insights Modal functionality
+        const AiInsights = (() => {
+            let isInitialized = false;
+
+            const init = () => {
+                if (isInitialized) return;
+                isInitialized = true;
+
+                const modal = document.getElementById('aiInsightsModal');
+                const closeBtn = document.getElementById('aiInsightsCloseBtn');
+                const generateBtn = document.getElementById('generateAiSummaryBtn');
+
+                if (!modal) return;
+
+                // Close button
+                closeBtn?.addEventListener('click', close);
+
+                // Click outside to close
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) close();
+                });
+
+                // Generate button
+                generateBtn?.addEventListener('click', generate);
+
+                // Load data when modal opens
+                loadSummaryTypes();
+                checkAiStatus();
+            };
+
+            const open = () => {
+                const modal = document.getElementById('aiInsightsModal');
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            };
+
+            const close = () => {
+                const modal = document.getElementById('aiInsightsModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            };
+
+            const loadSummaryTypes = async () => {
+                try {
+                    const types = await Api.summary.types();
+                    const select = document.getElementById('aiSummaryType');
+                    if (select) {
+                        select.innerHTML = types.map(t =>
+                            `<option value="${t.value}">${Utils.escapeHtml(t.displayName)}</option>`
+                        ).join('');
+                    }
+                } catch (e) {
+                    console.error('Failed to load summary types', e);
+                }
+            };
+
+            const checkAiStatus = async () => {
+                try {
+                    const status = await Api.summary.aiStatus();
+                    const statusText = document.getElementById('aiStatusText');
+                    const generateBtn = document.getElementById('generateAiSummaryBtn');
+
+                    if (statusText) {
+                        statusText.textContent = status.available ? 'Available' : 'Unavailable';
+                        statusText.style.color = status.available ? 'var(--color-success)' : 'var(--color-text-muted)';
+                    }
+                    if (generateBtn) {
+                        generateBtn.disabled = !status.available;
+                    }
+                } catch (e) {
+                    console.error('Failed to check AI status', e);
+                }
+            };
+
+            const generate = async () => {
+                const btn = document.getElementById('generateAiSummaryBtn');
+                const container = document.getElementById('aiInsightsContainer');
+                const typeSelect = document.getElementById('aiSummaryType');
+                const type = typeSelect?.value;
+
+                if (!type) return;
+
+                Utils.setButtonLoading(btn, true);
+
+                try {
+                    const s = await Api.summary.ai(type);
+                    container.innerHTML = `
+                        <div class="ai-summary-box">
+                            <div class="ai-summary-header">
+                                <span class="ai-summary-type">${Utils.escapeHtml(s.summaryTypeName || type)}</span>
+                                <span class="badge ${s.aiGenerated ? 'badge-status-completed' : 'badge-status-not_started'}">${s.aiGenerated ? 'AI' : 'Metrics'}</span>
+                            </div>
+                            <div class="ai-summary-content">${Utils.formatMarkdown(s.summary || 'No summary available.')}</div>
+                        </div>`;
+                } catch (e) {
+                    Toast.error(e.message || 'Failed to generate');
+                } finally {
+                    Utils.setButtonLoading(btn, false);
+                }
+            };
+
+            return { init, open, close };
+        })();
+    </script>
+</th:block>
+</body>
+</html>
+
