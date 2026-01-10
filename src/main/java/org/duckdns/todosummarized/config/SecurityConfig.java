@@ -30,16 +30,24 @@ public class SecurityConfig {
 
     // Public API endpoints (no authentication required)
     private static final String[] PUBLIC_AUTH_ENDPOINTS = {
-            "/api/auth/**"
+            "/api/auth/**",
+            "/api/meta/**",
+            "/api/summary/types",
+            "/api/summary/ai/status"
     };
 
     // Static resources and web pages
     private static final String[] PUBLIC_WEB_ENDPOINTS = {
+            "/",
             "/login",
             "/register",
+            "/dashboard",
+            "/todos",
+            "/summary",
             "/css/**",
             "/js/**",
             "/images/**",
+            "/favicon.ico",
             "/error"
     };
 
