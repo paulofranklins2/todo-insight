@@ -1,92 +1,118 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" th:attr="data-api-base=${apiBase}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Login | ' + ${appName}">Login | Todo Summarized</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
-<body class="auth-page">
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="brand-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<th:block th:fragment="modal">
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Sign In</h2>
+                <button class="modal-close" id="loginModalCloseBtn">&times;</button>
             </div>
-            <h1 th:text="${appName}">Todo Summarized</h1>
-            <p>Sign in to your account</p>
-        </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input type="email" id="loginEmail" name="email" class="form-control"
+                               placeholder="Enter your email" required autocomplete="email">
+                    </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-control"
-                       placeholder="Enter your email" required autocomplete="email">
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Password</label>
+                        <input type="password" id="loginPassword" name="password" class="form-control"
+                               placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+
+                    <div class="form-error hidden" id="loginErrorMessage"></div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginSubmitBtn">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-modal-footer">
+                    <p>Don't have an account? <a href="#" id="switchToRegister">Sign up</a></p>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control"
-                       placeholder="Enter your password" required autocomplete="current-password">
-            </div>
-
-            <div class="form-error hidden" id="errorMessage"></div>
-
-            <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
-                Sign In
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            <p>Don't have an account? <a th:href="@{/register}">Sign up</a></p>
         </div>
     </div>
+</th:block>
 
-    <div class="toast-container" id="toastContainer"></div>
-
-    <script th:src="@{/js/api.js}"></script>
-    <script th:src="@{/js/auth.js}"></script>
-    <script th:src="@{/js/utils.js}"></script>
+<th:block th:fragment="modal-scripts">
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('expired') === 'true' || urlParams.get('logout') === 'true') {
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('userEmail');
-            }
+        const LoginModal = (() => {
+            let isInitialized = false;
 
-            if (Auth.isAuthenticated()) {
-                window.location.href = '/dashboard';
-                return;
-            }
+            const init = () => {
+                if (isInitialized) return;
+                isInitialized = true;
 
-            const form = document.getElementById('loginForm');
-            const errorEl = document.getElementById('errorMessage');
-            const submitBtn = document.getElementById('submitBtn');
+                const modal = document.getElementById('loginModal');
+                const closeBtn = document.getElementById('loginModalCloseBtn');
+                const form = document.getElementById('loginForm');
+                const switchLink = document.getElementById('switchToRegister');
 
-            form.addEventListener('submit', async (e) => {
+                if (!modal) return;
+
+                closeBtn?.addEventListener('click', close);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) close();
+                });
+
+                switchLink?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    close();
+                    RegisterModal.open();
+                });
+
+                form?.addEventListener('submit', handleSubmit);
+            };
+
+            const open = () => {
+                const modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    document.getElementById('loginEmail')?.focus();
+                }
+            };
+
+            const close = () => {
+                const modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    document.getElementById('loginForm')?.reset();
+                    document.getElementById('loginErrorMessage')?.classList.add('hidden');
+                }
+            };
+
+            const handleSubmit = async (e) => {
                 e.preventDefault();
+                const errorEl = document.getElementById('loginErrorMessage');
+                const submitBtn = document.getElementById('loginSubmitBtn');
+
                 errorEl.classList.add('hidden');
                 Utils.setButtonLoading(submitBtn, true);
 
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value;
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
 
                 try {
                     const response = await Api.auth.signin({ email, password });
                     Auth.setTokens(response);
-                    Toast.success('Login successful!');
                     window.location.href = '/dashboard';
                 } catch (error) {
                     errorEl.textContent = error.message || 'Invalid credentials';
                     errorEl.classList.remove('hidden');
                     Utils.setButtonLoading(submitBtn, false);
                 }
-            });
-        });
+            };
+
+            return { init, open, close };
+        })();
     </script>
+</th:block>
 </body>
 </html>
 
