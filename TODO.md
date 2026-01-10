@@ -66,9 +66,10 @@
 
 ## P4 – Future Enhancements
 
-* [ ] Add cache to avoid db pulls
+* [x] Add Caffeine cache for users and todo search
+* [x] AI insight persistence (database + in-memory cache)
+* [x] Auto-load cached insight when modal opens
 * [ ] Tags / categories for todos
-* [ ] Cache daily summaries (Redis)
 * [ ] Actuator endpoints (health, info, metrics)
 * [ ] Dark mode theme
 * [ ] Export todos (CSV, JSON)
@@ -91,6 +92,7 @@
 * [x] CustomUserDetailsService tests
 * [x] AiProviderSelector tests
 * [x] Rate limiting tests
+* [x] AiSummaryService tests (caching, persistence)
 
 ---
 

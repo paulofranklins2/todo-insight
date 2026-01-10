@@ -93,55 +93,19 @@ Interactive API documentation available at:
 
 ```
 src/main/java/org/duckdns/todosummarized/
-├── config/                 # Security, OpenAPI, time config
-│   ├── SecurityConfig.java
-│   ├── OpenApiConfig.java
-│   ├── OpenAiProperties.java
-│   └── TimeConfig.java
-├── controller/             # REST controllers
-│   ├── AuthController.java
-│   ├── TodoController.java
-│   └── SummaryController.java
+├── config/          # Security, OpenAPI, cache, rate limit config
+├── controller/      # REST controllers (Auth, Todo, Summary)
 ├── domains/
-│   ├── entity/             # JPA entities
-│   │   ├── Todo.java
-│   │   └── User.java
-│   └── enums/              # Domain enums
-│       ├── TaskStatus.java
-│       ├── TaskPriority.java
-│       └── Role.java
-├── dto/
-│   ├── TodoRequestDTO.java
-│   ├── TodoResponseDTO.java
-│   ├── TodoMapper.java
-│   ├── UserRegistrationDTO.java
-│   ├── UserLoginDTO.java
-│   ├── UserResponseDTO.java
-│   └── DailySummaryDTO.java
-├── exception/
-│   ├── GlobalExceptionHandler.java
-│   ├── ErrorResponse.java
-│   ├── TodoNotFoundException.java
-│   ├── InvalidTodoException.java
-│   ├── DuplicateTodoException.java
-│   ├── UnauthorizedAccessException.java
-│   └── UserAlreadyExistsException.java
-├── repository/
-│   ├── TodoRepository.java
-│   ├── UserRepository.java
-│   ├── TodoQuery.java
-│   ├── spec/
-│   │   └── TodoSpecs.java
-│   └── projection/
-│       ├── StatusCountProjection.java
-│       └── PriorityCountProjection.java
-├── service/
-│   ├── TodoService.java
-│   ├── UserService.java
-│   ├── SummaryService.java
-│   └── CustomUserDetailsService.java
-└── resources/
-    └── static/         # CSS, JS, images
+│   ├── entity/      # JPA entities (Todo, User, AiInsight)
+│   └── enums/       # Domain enums (TaskStatus, TaskPriority, Role)
+├── dto/             # Request/Response DTOs and mappers
+├── exception/       # Global exception handling
+├── ratelimit/       # Rate limiting aspect and service
+├── repository/      # Spring Data JPA repositories
+└── service/         # Business logic and AI integration
+src/main/resources/
+├── static/          # CSS, JS, images
+└── templates/       # Thymeleaf templates
 ```
 
 ---
@@ -149,19 +113,6 @@ src/main/java/org/duckdns/todosummarized/
 ## Development Progress
 
 See [TODO.md](TODO.md) for detailed progress tracking.
-
----
-
-## Tech Stack
-
-- **Java 21** with **Spring Boot 4.0.1**
-- **Spring Data JPA** with PostgreSQL
-- **Spring Security** (session-based auth + HTTP Basic for API)
-- **Thymeleaf** (dependency added for future frontend)
-- **Bean Validation** (Jakarta Validation)
-- **Lombok** for boilerplate reduction
-- **JUnit 5 + Mockito** for testing
-- **Springdoc OpenAPI** for Swagger UI and API documentation
 
 ---
 
