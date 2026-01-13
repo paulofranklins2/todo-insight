@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Aspect that intercepts methods annotated with {@link RateLimit} and applies rate limiting.
- * Uses the authenticated user's ID to create per-user rate limit buckets.
  */
 @Aspect
 @Component
@@ -27,11 +26,6 @@ public class RateLimitAspect {
 
     /**
      * Intercepts methods annotated with @RateLimit and applies rate limiting.
-     *
-     * @param joinPoint  the join point representing the intercepted method
-     * @param rateLimit  the rate limit annotation
-     * @return the method result if allowed
-     * @throws Throwable if rate limit exceeded or method throws
      */
     @Around("@annotation(rateLimit)")
     public Object enforceRateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
@@ -62,8 +56,6 @@ public class RateLimitAspect {
 
     /**
      * Extracts the user ID from the current security context.
-     *
-     * @return the user ID or null if not authenticated
      */
     private String extractUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
