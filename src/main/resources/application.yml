@@ -4,7 +4,7 @@ spring:
 
   # Active profile
   profiles:
-    active: local
+    active: prod
 
   jpa:
     hibernate:
@@ -37,3 +37,17 @@ app:
     api-base: /api
     date-format: MMM dd, yyyy
     date-time-format: MMM dd, yyyy HH:mm
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    db:
+      enabled: true
+

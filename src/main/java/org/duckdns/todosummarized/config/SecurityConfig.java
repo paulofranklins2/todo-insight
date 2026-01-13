@@ -58,6 +58,12 @@ public class SecurityConfig {
             "/v3/api-docs.yaml"
     };
 
+    // Actuator endpoints
+    private static final String[] ACTUATOR_ENDPOINTS = {
+            "/actuator/health",
+            "/actuator/info"
+    };
+
     // Admin-only endpoints
     private static final String[] ADMIN_ENDPOINTS = {
             "/api/admin/**"
@@ -79,6 +85,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_AUTH_ENDPOINTS).permitAll()
                         .requestMatchers(PUBLIC_WEB_ENDPOINTS).permitAll()
                         .requestMatchers(SWAGGER_ENDPOINTS).permitAll()
+                        .requestMatchers(ACTUATOR_ENDPOINTS).permitAll()
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
